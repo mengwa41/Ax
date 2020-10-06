@@ -69,8 +69,7 @@ src="/js/documentation_options.js">
     <span class="k">if</span> <span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">class_type</span> <span class="ow">in</span> <span class="n">CLASS_ENCODER_REGISTRY</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">class_type</span><span class="p">):</span>
-                <span class="n">_type</span> <span class="o">=</span> <span class="n">class_type</span>
-                <span class="n">obj_dict</span> <span class="o">=</span> <span class="n">CLASS_ENCODER_REGISTRY</span><span class="p">[</span><span class="n">_type</span><span class="p">](</span><span class="n">obj</span><span class="p">)</span>
+                <span class="n">obj_dict</span> <span class="o">=</span> <span class="n">CLASS_ENCODER_REGISTRY</span><span class="p">[</span><span class="n">class_type</span><span class="p">](</span><span class="n">obj</span><span class="p">)</span>
                 <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">object_to_json</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obj_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s2"> is a class. Add it to the CLASS_ENCODER_REGISTRY "</span>

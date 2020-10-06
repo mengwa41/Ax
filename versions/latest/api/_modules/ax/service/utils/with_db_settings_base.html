@@ -177,6 +177,11 @@ src="/js/documentation_options.js">
                     <span class="sa">f</span><span class="s2">"Generation strategy </span><span class="si">{</span><span class="n">generation_strategy</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> is not yet in DB, "</span>
                     <span class="s2">"storing it."</span>
                 <span class="p">)</span>
+                <span class="c1"># If generation strategy does not yet have an experiment attached,</span>
+                <span class="c1"># attach the current experiment to it, as otherwise it will not be</span>
+                <span class="c1"># possible to retrieve by experiment name.</span>
+                <span class="k">if</span> <span class="n">generation_strategy</span><span class="o">.</span><span class="n">_experiment</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">generation_strategy</span><span class="o">.</span><span class="n">experiment</span> <span class="o">=</span> <span class="n">experiment</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_save_generation_strategy_to_db_if_possible</span><span class="p">(</span>
                     <span class="n">generation_strategy</span><span class="o">=</span><span class="n">generation_strategy</span>
                 <span class="p">)</span>

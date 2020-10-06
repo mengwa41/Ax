@@ -35,9 +35,13 @@ src="/js/documentation_options.js">
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">MutableMapping</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">ax.core.batch_trial</span> <span class="kn">import</span> <span class="n">BatchTrial</span>
 <span class="kn">from</span> <span class="nn">ax.core.experiment</span> <span class="kn">import</span> <span class="n">Experiment</span>
+<span class="kn">from</span> <span class="nn">ax.core.objective</span> <span class="kn">import</span> <span class="n">MultiObjective</span><span class="p">,</span> <span class="n">Objective</span><span class="p">,</span> <span class="n">ScalarizedObjective</span>
 <span class="kn">from</span> <span class="nn">ax.core.observation</span> <span class="kn">import</span> <span class="n">ObservationFeatures</span>
+<span class="kn">from</span> <span class="nn">ax.core.optimization_config</span> <span class="kn">import</span> <span class="n">TRefPoint</span>
+<span class="kn">from</span> <span class="nn">ax.core.outcome_constraint</span> <span class="kn">import</span> <span class="n">ComparisonOp</span><span class="p">,</span> <span class="n">OutcomeConstraint</span>
 <span class="kn">from</span> <span class="nn">ax.core.parameter</span> <span class="kn">import</span> <span class="n">ParameterType</span><span class="p">,</span> <span class="n">RangeParameter</span>
 <span class="kn">from</span> <span class="nn">ax.core.parameter_constraint</span> <span class="kn">import</span> <span class="n">ParameterConstraint</span>
 <span class="kn">from</span> <span class="nn">ax.core.search_space</span> <span class="kn">import</span> <span class="n">SearchSpace</span>
@@ -45,6 +49,7 @@ src="/js/documentation_options.js">
 <span class="kn">from</span> <span class="nn">ax.core.types</span> <span class="kn">import</span> <span class="n">TBounds</span><span class="p">,</span> <span class="n">TCandidateMetadata</span><span class="p">,</span> <span class="n">TParamValue</span>
 <span class="kn">from</span> <span class="nn">ax.modelbridge.transforms.base</span> <span class="kn">import</span> <span class="n">Transform</span>
 <span class="kn">from</span> <span class="nn">ax.utils.common.typeutils</span> <span class="kn">import</span> <span class="n">not_none</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 
 
 <div class="viewcode-block" id="extract_parameter_constraints"><a class="viewcode-back" href="../../../modelbridge.html#ax.modelbridge.modelbridge_utils.extract_parameter_constraints">[docs]</a><span class="k">def</span> <span class="nf">extract_parameter_constraints</span><span class="p">(</span>
@@ -88,6 +93,121 @@ src="/js/documentation_options.js">
             <span class="n">target_fidelities</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">target_value</span>
 
     <span class="k">return</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">task_features</span><span class="p">,</span> <span class="n">target_fidelities</span></div>
+
+
+<div class="viewcode-block" id="extract_objective_thresholds"><a class="viewcode-back" href="../../../modelbridge.html#ax.modelbridge.modelbridge_utils.extract_objective_thresholds">[docs]</a><span class="k">def</span> <span class="nf">extract_objective_thresholds</span><span class="p">(</span>
+    <span class="n">objective_thresholds</span><span class="p">:</span> <span class="n">TRefPoint</span><span class="p">,</span> <span class="n">outcomes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="sd">"""Extracts objective thresholds' values, in the order of `outcomes`.</span>
+
+<span class="sd">    The extracted array will be no greater than the number of values in the</span>
+<span class="sd">    objective_thresholds, typically the same as number of objectives being</span>
+<span class="sd">    optimized.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        objective_thresholds: Reference Point to extract values from.</span>
+<span class="sd">        outcomes: n-length list of names of metrics.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        len(objective_thresholds)-length list of reference point coordinates</span>
+<span class="sd">    """</span>
+    <span class="n">objective_threshold_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">ot</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">ot</span><span class="o">.</span><span class="n">bound</span> <span class="k">for</span> <span class="n">ot</span> <span class="ow">in</span> <span class="n">objective_thresholds</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">objective_threshold_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">outcomes</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">objective_threshold_dict</span>
+        <span class="p">]</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="extract_objective_weights"><a class="viewcode-back" href="../../../modelbridge.html#ax.modelbridge.modelbridge_utils.extract_objective_weights">[docs]</a><span class="k">def</span> <span class="nf">extract_objective_weights</span><span class="p">(</span><span class="n">objective</span><span class="p">:</span> <span class="n">Objective</span><span class="p">,</span> <span class="n">outcomes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="sd">"""Extract a weights for objectives.</span>
+
+<span class="sd">    Weights are for a maximization problem.</span>
+
+<span class="sd">    Give an objective weight to each modeled outcome. Outcomes that are modeled</span>
+<span class="sd">    but not part of the objective get weight 0.</span>
+
+<span class="sd">    In the single metric case, the objective is given either +/- 1, depending</span>
+<span class="sd">    on the minimize flag.</span>
+
+<span class="sd">    In the multiple metric case, each objective is given the input weight,</span>
+<span class="sd">    multiplied by the minimize flag.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        objective: Objective to extract weights from.</span>
+<span class="sd">        outcomes: n-length list of names of metrics.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        n-length list of weights.</span>
+
+<span class="sd">    """</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="k">if</span> <span class="n">objective</span><span class="o">.</span><span class="n">minimize</span> <span class="k">else</span> <span class="mf">1.0</span>
+    <span class="n">objective_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">outcomes</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">ScalarizedObjective</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">obj_metric</span><span class="p">,</span> <span class="n">obj_weight</span> <span class="ow">in</span> <span class="n">objective</span><span class="o">.</span><span class="n">metric_weights</span><span class="p">:</span>
+            <span class="n">objective_weights</span><span class="p">[</span><span class="n">outcomes</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">obj_metric</span><span class="o">.</span><span class="n">name</span><span class="p">)]</span> <span class="o">=</span> <span class="n">obj_weight</span> <span class="o">*</span> <span class="n">s</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">objective</span><span class="p">,</span> <span class="n">MultiObjective</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">obj_metric</span><span class="p">,</span> <span class="n">obj_weight</span> <span class="ow">in</span> <span class="n">objective</span><span class="o">.</span><span class="n">metric_weights</span><span class="p">:</span>
+            <span class="c1"># Rely on previously extracted lower_is_better weights not objective.</span>
+            <span class="n">objective_weights</span><span class="p">[</span><span class="n">outcomes</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">obj_metric</span><span class="o">.</span><span class="n">name</span><span class="p">)]</span> <span class="o">=</span> <span class="n">obj_weight</span> <span class="ow">or</span> <span class="n">s</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">objective_weights</span><span class="p">[</span><span class="n">outcomes</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">objective</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">name</span><span class="p">)]</span> <span class="o">=</span> <span class="n">s</span>
+    <span class="k">return</span> <span class="n">objective_weights</span></div>
+
+
+<div class="viewcode-block" id="extract_outcome_constraints"><a class="viewcode-back" href="../../../modelbridge.html#ax.modelbridge.modelbridge_utils.extract_outcome_constraints">[docs]</a><span class="k">def</span> <span class="nf">extract_outcome_constraints</span><span class="p">(</span>
+    <span class="n">outcome_constraints</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">OutcomeConstraint</span><span class="p">],</span> <span class="n">outcomes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TBounds</span><span class="p">:</span>
+    <span class="c1"># Extract outcome constraints</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">outcome_constraints</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">outcome_constraints</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">outcomes</span><span class="p">)))</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">outcome_constraints</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">outcome_constraints</span><span class="p">):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="n">ComparisonOp</span><span class="o">.</span><span class="n">LEQ</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">outcomes</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span>
+            <span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span> <span class="o">*</span> <span class="n">c</span><span class="o">.</span><span class="n">bound</span>
+        <span class="n">outcome_constraint_bounds</span><span class="p">:</span> <span class="n">TBounds</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">outcome_constraint_bounds</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">outcome_constraint_bounds</span></div>
+
+
+<div class="viewcode-block" id="validate_and_apply_final_transform"><a class="viewcode-back" href="../../../modelbridge.html#ax.modelbridge.modelbridge_utils.validate_and_apply_final_transform">[docs]</a><span class="k">def</span> <span class="nf">validate_and_apply_final_transform</span><span class="p">(</span>
+    <span class="n">objective_weights</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">outcome_constraints</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]],</span>
+    <span class="n">linear_constraints</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]],</span>
+    <span class="n">pending_observations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]],</span>
+    <span class="n">final_transform</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
+    <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]],</span>
+    <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]],</span>
+    <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]],</span>
+<span class="p">]:</span>
+    <span class="n">objective_weights</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">=</span> <span class="n">final_transform</span><span class="p">(</span><span class="n">objective_weights</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">outcome_constraints</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="n">outcome_constraints</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">final_transform</span><span class="p">(</span><span class="n">outcome_constraints</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+            <span class="n">final_transform</span><span class="p">(</span><span class="n">outcome_constraints</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">linear_constraints</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="n">linear_constraints</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">final_transform</span><span class="p">(</span><span class="n">linear_constraints</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+            <span class="n">final_transform</span><span class="p">(</span><span class="n">linear_constraints</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">pending_observations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="n">pending_observations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">final_transform</span><span class="p">(</span><span class="n">pending_obs</span><span class="p">)</span> <span class="k">for</span> <span class="n">pending_obs</span> <span class="ow">in</span> <span class="n">pending_observations</span>
+        <span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">objective_weights</span><span class="p">,</span>
+        <span class="n">outcome_constraints</span><span class="p">,</span>
+        <span class="n">linear_constraints</span><span class="p">,</span>
+        <span class="n">pending_observations</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_fixed_features"><a class="viewcode-back" href="../../../modelbridge.html#ax.modelbridge.modelbridge_utils.get_fixed_features">[docs]</a><span class="k">def</span> <span class="nf">get_fixed_features</span><span class="p">(</span>

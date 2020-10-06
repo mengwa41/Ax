@@ -447,6 +447,7 @@ src="/js/documentation_options.js">
         <span class="s2">"__type"</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
         <span class="s2">"surrogate"</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">surrogate</span><span class="p">,</span>
         <span class="s2">"surrogate_fit_options"</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">surrogate_fit_options</span><span class="p">,</span>
+        <span class="s2">"surrogate_options"</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">surrogate_options</span><span class="p">,</span>
         <span class="s2">"acquisition_class"</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">acquisition_class</span><span class="p">,</span>
         <span class="s2">"botorch_acqf_class"</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">botorch_acqf_class</span><span class="p">,</span>
         <span class="s2">"acquisition_options"</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">acquisition_options</span> <span class="ow">or</span> <span class="p">{},</span>
@@ -455,15 +456,9 @@ src="/js/documentation_options.js">
 
 <div class="viewcode-block" id="surrogate_to_dict"><a class="viewcode-back" href="../../../../storage.html#ax.storage.json_store.encoders.surrogate_to_dict">[docs]</a><span class="k">def</span> <span class="nf">surrogate_to_dict</span><span class="p">(</span><span class="n">surrogate</span><span class="p">:</span> <span class="n">Surrogate</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="sd">"""Convert Ax surrogate to a dictionary."""</span>
-    <span class="k">return</span> <span class="p">{</span>
-        <span class="s2">"__type"</span><span class="p">:</span> <span class="n">surrogate</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
-        <span class="s2">"botorch_model_class"</span><span class="p">:</span> <span class="n">surrogate</span><span class="o">.</span><span class="n">botorch_model_class</span><span class="p">,</span>
-        <span class="s2">"mll_class"</span><span class="p">:</span> <span class="n">surrogate</span><span class="o">.</span><span class="n">mll_class</span><span class="p">,</span>
-        <span class="c1"># TODO: Add these once they are implemented.</span>
-        <span class="c1"># "kernel_class": surrogate.kernel_class,</span>
-        <span class="c1"># "kernel_options": surrogate.kernel_options or {},</span>
-        <span class="c1"># "likelihood": surrogate.likelihood,</span>
-    <span class="p">}</span></div>
+    <span class="n">dict_representation</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"__type"</span><span class="p">:</span> <span class="n">surrogate</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">}</span>
+    <span class="n">dict_representation</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">surrogate</span><span class="o">.</span><span class="n">_serialize_attributes_as_kwargs</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">dict_representation</span></div>
 
 
 <div class="viewcode-block" id="botorch_modular_to_dict"><a class="viewcode-back" href="../../../../storage.html#ax.storage.json_store.encoders.botorch_modular_to_dict">[docs]</a><span class="k">def</span> <span class="nf">botorch_modular_to_dict</span><span class="p">(</span><span class="n">class_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
@@ -471,6 +466,12 @@ src="/js/documentation_options.js">
     <span class="k">for</span> <span class="n">_class</span> <span class="ow">in</span> <span class="n">CLASS_TO_REGISTRY</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">class_type</span><span class="p">,</span> <span class="n">_class</span><span class="p">):</span>
             <span class="n">registry</span> <span class="o">=</span> <span class="n">CLASS_TO_REGISTRY</span><span class="p">[</span><span class="n">_class</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">class_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">registry</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>  <span class="c1"># pragma: no cover</span>
+                    <span class="sa">f</span><span class="s2">"Class `</span><span class="si">{</span><span class="n">class_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">` not in Type[</span><span class="si">{</span><span class="n">_class</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">] "</span>
+                    <span class="s2">"registry, please add it. BoTorch object registries are "</span>
+                    <span class="s2">"located in `ax/storage/botorch_modular_registry.py`."</span>
+                <span class="p">)</span>
             <span class="k">return</span> <span class="p">{</span>
                 <span class="s2">"__type"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Type[</span><span class="si">{</span><span class="n">_class</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">]"</span><span class="p">,</span>
                 <span class="s2">"index"</span><span class="p">:</span> <span class="n">registry</span><span class="p">[</span><span class="n">class_type</span><span class="p">],</span>

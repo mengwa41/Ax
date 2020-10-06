@@ -32,7 +32,7 @@ src="/js/documentation_options.js">
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
@@ -41,17 +41,28 @@ src="/js/documentation_options.js">
 <span class="kn">from</span> <span class="nn">ax.core.generator_run</span> <span class="kn">import</span> <span class="n">GeneratorRun</span>
 <span class="kn">from</span> <span class="nn">ax.core.multi_type_experiment</span> <span class="kn">import</span> <span class="n">MultiTypeExperiment</span>
 <span class="kn">from</span> <span class="nn">ax.core.observation</span> <span class="kn">import</span> <span class="n">ObservationData</span><span class="p">,</span> <span class="n">ObservationFeatures</span>
-<span class="kn">from</span> <span class="nn">ax.core.optimization_config</span> <span class="kn">import</span> <span class="n">OptimizationConfig</span>
+<span class="kn">from</span> <span class="nn">ax.core.optimization_config</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MultiObjectiveOptimizationConfig</span><span class="p">,</span>
+    <span class="n">OptimizationConfig</span><span class="p">,</span>
+    <span class="n">TRefPoint</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">ax.core.search_space</span> <span class="kn">import</span> <span class="n">SearchSpace</span>
 <span class="kn">from</span> <span class="nn">ax.core.types</span> <span class="kn">import</span> <span class="n">TCandidateMetadata</span><span class="p">,</span> <span class="n">TConfig</span><span class="p">,</span> <span class="n">TGenMetadata</span>
 <span class="kn">from</span> <span class="nn">ax.modelbridge.array</span> <span class="kn">import</span> <span class="n">FIT_MODEL_ERROR</span>
+<span class="kn">from</span> <span class="nn">ax.modelbridge.modelbridge_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">extract_objective_thresholds</span><span class="p">,</span>
+    <span class="n">validate_and_apply_final_transform</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">ax.modelbridge.torch</span> <span class="kn">import</span> <span class="n">TorchModelBridge</span>
 <span class="kn">from</span> <span class="nn">ax.modelbridge.transforms.base</span> <span class="kn">import</span> <span class="n">Transform</span>
+<span class="kn">from</span> <span class="nn">ax.models.torch.frontier_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">TFrontierEvaluator</span><span class="p">,</span>
+    <span class="n">get_default_frontier_evaluator</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">ax.models.torch_base</span> <span class="kn">import</span> <span class="n">TorchModel</span>
 <span class="kn">from</span> <span class="nn">ax.utils.common.docutils</span> <span class="kn">import</span> <span class="n">copy_doc</span>
 <span class="kn">from</span> <span class="nn">ax.utils.common.logger</span> <span class="kn">import</span> <span class="n">get_logger</span>
-<span class="kn">from</span> <span class="nn">ax.utils.common.typeutils</span> <span class="kn">import</span> <span class="n">not_none</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span> <span class="nn">ax.utils.common.typeutils</span> <span class="kn">import</span> <span class="n">checked_cast_optional</span><span class="p">,</span> <span class="n">not_none</span>
 
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">"MultiObjectiveTorchModelBridge"</span><span class="p">)</span>
@@ -71,7 +82,6 @@ src="/js/documentation_options.js">
 <span class="sd">    them to the model.</span>
 <span class="sd">    """</span>
 
-    <span class="n">_transformed_ref_point</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span>
     <span class="n">_objective_metric_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -86,24 +96,42 @@ src="/js/documentation_options.js">
         <span class="n">torch_device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">status_quo_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">status_quo_features</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservationFeatures</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">optimization_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">OptimizationConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">optimization_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MultiObjectiveOptimizationConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">fit_out_of_design</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">ref_point</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">objective_thresholds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TRefPoint</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">default_model_gen_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span> <span class="n">MultiTypeExperiment</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ref_point</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">experiment</span><span class="p">,</span> <span class="n">MultiTypeExperiment</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">objective_thresholds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="s2">"Ref-point dependent multi-objective optimization algorithms "</span>
+                <span class="s2">"Objective threshold dependent multi-objective optimization algos "</span>
                 <span class="s2">"like EHVI are not yet supported for MultiTypeExperiments. "</span>
-                <span class="s2">"Remove the reference point arg and use a compatible algorithm "</span>
+                <span class="s2">"Remove the objective threshold arg and use a compatible algorithm "</span>
                 <span class="s2">"like ParEGO."</span>
             <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ref_point</span> <span class="o">=</span> <span class="n">ref_point</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_transformed_ref_point</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_objective_metric_names</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">oc</span> <span class="o">=</span> <span class="n">optimization_config</span> <span class="ow">or</span> <span class="n">experiment</span><span class="o">.</span><span class="n">optimization_config</span>
-        <span class="k">if</span> <span class="n">oc</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_objective_metric_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">oc</span><span class="o">.</span><span class="n">objective</span><span class="o">.</span><span class="n">metrics</span><span class="p">]</span>
+        <span class="c1"># Optimization_config</span>
+        <span class="n">mooc</span> <span class="o">=</span> <span class="n">optimization_config</span> <span class="ow">or</span> <span class="n">checked_cast_optional</span><span class="p">(</span>
+            <span class="n">MultiObjectiveOptimizationConfig</span><span class="p">,</span> <span class="n">experiment</span><span class="o">.</span><span class="n">optimization_config</span>
+        <span class="p">)</span>
+        <span class="c1"># Extract objective_thresholds from optimization_config, or inject it.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mooc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="s2">"experiment must have an existing optimization_config "</span>
+                    <span class="s2">"of type MultiObjectiveOptimizationConfig "</span>
+                    <span class="s2">"or `optimization_config` must be passed as an argument."</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mooc</span><span class="p">,</span> <span class="n">MultiObjectiveOptimizationConfig</span><span class="p">):</span>
+            <span class="n">mooc</span> <span class="o">=</span> <span class="n">not_none</span><span class="p">(</span><span class="n">MultiObjectiveOptimizationConfig</span><span class="o">.</span><span class="n">from_opt_conf</span><span class="p">(</span><span class="n">mooc</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">objective_thresholds</span><span class="p">:</span>
+            <span class="n">mooc</span> <span class="o">=</span> <span class="n">mooc</span><span class="o">.</span><span class="n">clone_with_args</span><span class="p">(</span><span class="n">objective_thresholds</span><span class="o">=</span><span class="n">objective_thresholds</span><span class="p">)</span>
+
+        <span class="n">optimization_config</span> <span class="o">=</span> <span class="n">mooc</span>
+
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">experiment</span><span class="o">=</span><span class="n">experiment</span><span class="p">,</span>
             <span class="n">search_space</span><span class="o">=</span><span class="n">search_space</span><span class="p">,</span>
@@ -120,6 +148,24 @@ src="/js/documentation_options.js">
             <span class="n">default_model_gen_options</span><span class="o">=</span><span class="n">default_model_gen_options</span><span class="p">,</span>
         <span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">_get_extra_model_gen_kwargs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">optimization_config</span><span class="p">:</span> <span class="n">OptimizationConfig</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">extra_kwargs_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">optimization_config</span><span class="p">,</span> <span class="n">MultiObjectiveOptimizationConfig</span><span class="p">):</span>
+            <span class="n">objective_thresholds</span> <span class="o">=</span> <span class="n">extract_objective_thresholds</span><span class="p">(</span>
+                <span class="n">objective_thresholds</span><span class="o">=</span><span class="n">optimization_config</span><span class="o">.</span><span class="n">objective_thresholds</span><span class="p">,</span>
+                <span class="n">outcomes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outcomes</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">objective_thresholds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="n">objective_thresholds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="n">objective_thresholds</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span>
+            <span class="n">objective_thresholds</span>
+        <span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">objective_thresholds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">extra_kwargs_dict</span><span class="p">[</span><span class="s2">"objective_thresholds"</span><span class="p">]</span> <span class="o">=</span> <span class="n">objective_thresholds</span>
+        <span class="k">return</span> <span class="n">extra_kwargs_dict</span>
+
     <span class="k">def</span> <span class="nf">_model_gen</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -132,29 +178,22 @@ src="/js/documentation_options.js">
         <span class="n">model_gen_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TConfig</span><span class="p">],</span>
         <span class="n">rounding_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
         <span class="n">target_fidelities</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
+        <span class="n">objective_thresholds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">TGenMetadata</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">TCandidateMetadata</span><span class="p">]]:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">FIT_MODEL_ERROR</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">"_model_gen"</span><span class="p">))</span>
-        <span class="n">obj_w</span><span class="p">,</span> <span class="n">oc_c</span><span class="p">,</span> <span class="n">l_c</span><span class="p">,</span> <span class="n">pend_obs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_and_convert_to_tensors</span><span class="p">(</span>
+        <span class="n">obj_w</span><span class="p">,</span> <span class="n">oc_c</span><span class="p">,</span> <span class="n">l_c</span><span class="p">,</span> <span class="n">pend_obs</span> <span class="o">=</span> <span class="n">validate_and_apply_final_transform</span><span class="p">(</span>
             <span class="n">objective_weights</span><span class="o">=</span><span class="n">objective_weights</span><span class="p">,</span>
             <span class="n">outcome_constraints</span><span class="o">=</span><span class="n">outcome_constraints</span><span class="p">,</span>
             <span class="n">linear_constraints</span><span class="o">=</span><span class="n">linear_constraints</span><span class="p">,</span>
             <span class="n">pending_observations</span><span class="o">=</span><span class="n">pending_observations</span><span class="p">,</span>
+            <span class="n">final_transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_array_to_tensor</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">ref_point</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transformed_ref_point</span><span class="p">:</span>
-            <span class="n">ref_point</span> <span class="o">=</span> <span class="n">not_none</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_transformed_ref_point</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref_point</span><span class="p">:</span>
-            <span class="n">ref_point</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref_point</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">"No attribute _transformed_ref_point. Using untransformed ref_point."</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="n">ref_point</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">ref_point_list</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">ref_point</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">not_none</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outcomes</span><span class="p">)</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">ref_point</span>
-            <span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">ref_point_list</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">obj_t</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_array_to_tensor</span><span class="p">(</span><span class="n">objective_thresholds</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">objective_thresholds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
         <span class="n">tensor_rounding_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_array_callable_to_tensor_callable</span><span class="p">(</span><span class="n">rounding_func</span><span class="p">)</span>
         <span class="n">augmented_model_gen_options</span> <span class="o">=</span> <span class="p">{</span>
             <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_default_model_gen_options</span><span class="p">,</span>
@@ -166,13 +205,13 @@ src="/js/documentation_options.js">
             <span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span><span class="p">,</span>
             <span class="n">objective_weights</span><span class="o">=</span><span class="n">obj_w</span><span class="p">,</span>
             <span class="n">outcome_constraints</span><span class="o">=</span><span class="n">oc_c</span><span class="p">,</span>
+            <span class="n">objective_thresholds</span><span class="o">=</span><span class="n">obj_t</span><span class="p">,</span>
             <span class="n">linear_constraints</span><span class="o">=</span><span class="n">l_c</span><span class="p">,</span>
             <span class="n">fixed_features</span><span class="o">=</span><span class="n">fixed_features</span><span class="p">,</span>
             <span class="n">pending_observations</span><span class="o">=</span><span class="n">pend_obs</span><span class="p">,</span>
             <span class="n">model_gen_options</span><span class="o">=</span><span class="n">augmented_model_gen_options</span><span class="p">,</span>
             <span class="n">rounding_func</span><span class="o">=</span><span class="n">tensor_rounding_func</span><span class="p">,</span>
             <span class="n">target_fidelities</span><span class="o">=</span><span class="n">target_fidelities</span><span class="p">,</span>
-            <span class="n">ref_point</span><span class="o">=</span><span class="n">ref_point_list</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">X</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
@@ -198,59 +237,7 @@ src="/js/documentation_options.js">
             <span class="n">transforms</span><span class="o">=</span><span class="n">transforms</span><span class="p">,</span>
             <span class="n">transform_configs</span><span class="o">=</span><span class="n">transform_configs</span><span class="p">,</span>
         <span class="p">)</span>
-
-        <span class="n">ref_point</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref_point</span>
-        <span class="k">if</span> <span class="n">ref_point</span> <span class="ow">and</span> <span class="n">obs_data</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_transformed_ref_point</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transform_ref_point</span><span class="p">(</span>
-                <span class="n">ref_point</span><span class="o">=</span><span class="n">ref_point</span><span class="p">,</span> <span class="n">padding_obs_data</span><span class="o">=</span><span class="n">obs_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="p">)</span>
         <span class="k">return</span> <span class="n">obs_feats</span><span class="p">,</span> <span class="n">obs_data</span><span class="p">,</span> <span class="n">search_space</span>
-
-    <span class="k">def</span> <span class="nf">_transform_ref_point</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">ref_point</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">padding_obs_data</span><span class="p">:</span> <span class="n">ObservationData</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-        <span class="sd">"""Transform ref_point using same transforms as those applied to data.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            ref_point: Reference point to transform.</span>
-<span class="sd">            padding_obs_data: Data used to add dummy outcomes that aren't part</span>
-<span class="sd">                of the reference point. This is necessary to apply transforms.</span>
-
-<span class="sd">        Return:</span>
-<span class="sd">            A transformed reference point.</span>
-<span class="sd">        """</span>
-        <span class="n">metric_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_metric_names</span> <span class="ow">or</span> <span class="p">[])</span>
-        <span class="n">objective_metric_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_objective_metric_names</span> <span class="ow">or</span> <span class="p">[])</span>
-        <span class="n">num_metrics</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">metric_names</span><span class="p">)</span>
-        <span class="c1"># Create synthetic ObservationData representing the reference point.</span>
-        <span class="c1"># Pad with non-objective outcomes from existing data.</span>
-        <span class="c1"># Should always have existing data with BO.</span>
-        <span class="n">padding_obs_data</span>
-        <span class="n">padded_ref_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-            <span class="nb">zip</span><span class="p">(</span><span class="n">padding_obs_data</span><span class="o">.</span><span class="n">metric_names</span><span class="p">,</span> <span class="n">padding_obs_data</span><span class="o">.</span><span class="n">means</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="n">padded_ref_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ref_point</span><span class="p">)</span>
-        <span class="n">ref_obs_data</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">ObservationData</span><span class="p">(</span>
-                <span class="n">metric_names</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">padded_ref_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
-                <span class="n">means</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">padded_ref_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())),</span>
-                <span class="n">covariance</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_metrics</span><span class="p">,</span> <span class="n">num_metrics</span><span class="p">)),</span>
-            <span class="p">)</span>
-        <span class="p">]</span>
-        <span class="n">ref_obs_feats</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="c1"># Apply initialized transforms to reference point.</span>
-        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-            <span class="n">ref_obs_data</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">transform_observation_data</span><span class="p">(</span><span class="n">ref_obs_data</span><span class="p">,</span> <span class="n">ref_obs_feats</span><span class="p">)</span>
-        <span class="n">transformed_ref_obsd</span> <span class="o">=</span> <span class="n">ref_obs_data</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-        <span class="n">transformed_ref_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-            <span class="nb">zip</span><span class="p">(</span><span class="n">transformed_ref_obsd</span><span class="o">.</span><span class="n">metric_names</span><span class="p">,</span> <span class="n">transformed_ref_obsd</span><span class="o">.</span><span class="n">means</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="n">transformed_ref_point</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">objective_metric_name</span><span class="p">:</span> <span class="n">transformed_ref_dict</span><span class="p">[</span><span class="n">objective_metric_name</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">objective_metric_name</span> <span class="ow">in</span> <span class="n">objective_metric_names</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="n">transformed_ref_point</span>
 
     <span class="c1"># pyre-fixme[56]: While applying decorator</span>
     <span class="c1">#  `ax.utils.common.docutils.copy_doc(...)`: Call expects argument `n`.</span>
@@ -278,18 +265,13 @@ src="/js/documentation_options.js">
             <span class="n">model_gen_options</span><span class="o">=</span><span class="n">model_gen_options</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-    <span class="c1"># TODO: Complete these stubs based on https://fb.quip.com/fUMRATIeahCy</span>
-<div class="viewcode-block" id="MultiObjectiveTorchModelBridge.pareto_frontier"><a class="viewcode-back" href="../../../modelbridge.html#ax.modelbridge.multi_objective_torch.MultiObjectiveTorchModelBridge.pareto_frontier">[docs]</a>    <span class="k">def</span> <span class="nf">pareto_frontier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="MultiObjectiveTorchModelBridge.observed_pareto_frontier"><a class="viewcode-back" href="../../../modelbridge.html#ax.modelbridge.multi_objective_torch.MultiObjectiveTorchModelBridge.observed_pareto_frontier">[docs]</a>    <span class="k">def</span> <span class="nf">observed_pareto_frontier</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="MultiObjectiveTorchModelBridge.hypervolume"><a class="viewcode-back" href="../../../modelbridge.html#ax.modelbridge.multi_objective_torch.MultiObjectiveTorchModelBridge.hypervolume">[docs]</a>    <span class="k">def</span> <span class="nf">hypervolume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="MultiObjectiveTorchModelBridge.observed_hypervolume"><a class="viewcode-back" href="../../../modelbridge.html#ax.modelbridge.multi_objective_torch.MultiObjectiveTorchModelBridge.observed_hypervolume">[docs]</a>    <span class="k">def</span> <span class="nf">observed_hypervolume</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div></div>
+    <span class="k">def</span> <span class="nf">_get_frontier_evaluator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TFrontierEvaluator</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="c1"># pyre-ignore [16]: `TorchModel has no attribute `frontier_evaluator`</span>
+            <span class="n">not_none</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="n">frontier_evaluator</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">"frontier_evaluator"</span><span class="p">)</span>
+            <span class="k">else</span> <span class="n">get_default_frontier_evaluator</span><span class="p">()</span>
+        <span class="p">)</span></div>
 </pre></div>
 </div>
 </div>

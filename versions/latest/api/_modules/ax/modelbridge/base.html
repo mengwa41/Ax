@@ -49,7 +49,7 @@ src="/js/documentation_options.js">
     <span class="n">observations_from_data</span><span class="p">,</span>
     <span class="n">separate_observations</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ax.core.optimization_config</span> <span class="kn">import</span> <span class="n">OptimizationConfig</span>
+<span class="kn">from</span> <span class="nn">ax.core.optimization_config</span> <span class="kn">import</span> <span class="n">OptimizationConfig</span><span class="p">,</span> <span class="n">TRefPoint</span>
 <span class="kn">from</span> <span class="nn">ax.core.search_space</span> <span class="kn">import</span> <span class="n">SearchSpace</span>
 <span class="kn">from</span> <span class="nn">ax.core.types</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">TCandidateMetadata</span><span class="p">,</span>
@@ -835,6 +835,32 @@ src="/js/documentation_options.js">
             <span class="s2">"Feature importance not available for this model type"</span>
         <span class="p">)</span></div>
 
+<div class="viewcode-block" id="ModelBridge.transform_observation_data"><a class="viewcode-back" href="../../../modelbridge.html#ax.modelbridge.base.ModelBridge.transform_observation_data">[docs]</a>    <span class="k">def</span> <span class="nf">transform_observation_data</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">observation_data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationData</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">"""Applies transforms to given observation features and returns them in the</span>
+<span class="sd">        model space.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            observation_features: ObservationFeatures to be transformed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Transformed values. This could be e.g. a torch Tensor, depending</span>
+<span class="sd">            on the ModelBridge subclass.</span>
+<span class="sd">        """</span>
+        <span class="n">obsd</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">observation_data</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">obsd</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">transform_observation_data</span><span class="p">(</span><span class="n">obsd</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="c1"># Apply terminal transform and return</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transform_observation_data</span><span class="p">(</span><span class="n">obsd</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_transform_observation_data</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">observation_data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationData</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">"""Apply terminal transform to given observation features and return result.</span>
+<span class="sd">        """</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>  <span class="c1"># pragma: no cover</span>
+
 <div class="viewcode-block" id="ModelBridge.transform_observation_features"><a class="viewcode-back" href="../../../modelbridge.html#ax.modelbridge.base.ModelBridge.transform_observation_features">[docs]</a>    <span class="k">def</span> <span class="nf">transform_observation_features</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">observation_features</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationFeatures</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
@@ -859,7 +885,155 @@ src="/js/documentation_options.js">
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="sd">"""Apply terminal transform to given observation features and return result.</span>
 <span class="sd">        """</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>  <span class="c1"># pragma: no cover</span>
+
+<div class="viewcode-block" id="ModelBridge.transform_optimization_config"><a class="viewcode-back" href="../../../modelbridge.html#ax.modelbridge.base.ModelBridge.transform_optimization_config">[docs]</a>    <span class="k">def</span> <span class="nf">transform_optimization_config</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">optimization_config</span><span class="p">:</span> <span class="n">OptimizationConfig</span><span class="p">,</span>
+        <span class="n">fixed_features</span><span class="p">:</span> <span class="n">ObservationFeatures</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">"""Applies transforms to given optimization config.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            optimization_config: OptimizationConfig to transform.</span>
+<span class="sd">            fixed_features: features which should not be transformed.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Transformed values. This could be e.g. a torch Tensor, depending</span>
+<span class="sd">            on the ModelBridge subclass.</span>
+<span class="sd">        """</span>
+        <span class="n">optimization_config</span> <span class="o">=</span> <span class="n">optimization_config</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">optimization_config</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">transform_optimization_config</span><span class="p">(</span>
+                <span class="n">optimization_config</span><span class="o">=</span><span class="n">optimization_config</span><span class="p">,</span>
+                <span class="n">modelbridge</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+                <span class="n">fixed_features</span><span class="o">=</span><span class="n">fixed_features</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">optimization_config</span></div>
+
+    <span class="k">def</span> <span class="nf">_pareto_frontier</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">objective_thresholds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TRefPoint</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">observation_features</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ObservationFeatures</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">observation_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ObservationData</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">optimization_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">OptimizationConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationData</span><span class="p">]:</span>
+        <span class="sd">"""Helper that applies transforms and calls frontier_evaluator."""</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>  <span class="c1"># pragma: no cover</span>
+
+<div class="viewcode-block" id="ModelBridge.predicted_pareto_frontier"><a class="viewcode-back" href="../../../modelbridge.html#ax.modelbridge.base.ModelBridge.predicted_pareto_frontier">[docs]</a>    <span class="k">def</span> <span class="nf">predicted_pareto_frontier</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">objective_thresholds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TRefPoint</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">observation_features</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ObservationFeatures</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">optimization_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">OptimizationConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationData</span><span class="p">]:</span>
+        <span class="sd">"""Generate a pareto frontier based on the posterior means of given</span>
+<span class="sd">        observation features.</span>
+
+<span class="sd">        Given a model and features to evaluate use the model to predict which points</span>
+<span class="sd">        lie on the pareto frontier.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            objective_thresholds: metric values bounding the region of interest in</span>
+<span class="sd">                the objective outcome space.</span>
+<span class="sd">            observation_features: observation features to predict. Model's training</span>
+<span class="sd">                data used by default if unspecified.</span>
+<span class="sd">            optimization_config: Optimization config</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Data representing points on the pareto frontier.</span>
+<span class="sd">        """</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>  <span class="c1"># pragma: no cover</span></div>
+
+<div class="viewcode-block" id="ModelBridge.observed_pareto_frontier"><a class="viewcode-back" href="../../../modelbridge.html#ax.modelbridge.base.ModelBridge.observed_pareto_frontier">[docs]</a>    <span class="k">def</span> <span class="nf">observed_pareto_frontier</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">objective_thresholds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TRefPoint</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">optimization_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">OptimizationConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationData</span><span class="p">]:</span>
+        <span class="sd">"""Generate a pareto frontier based on observed data.</span>
+
+<span class="sd">        Given observed data, return those outcomes in the pareto frontier.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            objective_thresholds: metric values bounding the region of interest in</span>
+<span class="sd">                the objective outcome space.</span>
+<span class="sd">            optimization_config: Optimization config</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Data representing points on the pareto frontier.</span>
+<span class="sd">        """</span>
+        <span class="c1"># Get observation_data from current training data</span>
+        <span class="n">observation_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">obs</span><span class="o">.</span><span class="n">data</span> <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_training_data</span><span class="p">()]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pareto_frontier</span><span class="p">(</span>
+            <span class="n">objective_thresholds</span><span class="o">=</span><span class="n">objective_thresholds</span><span class="p">,</span>
+            <span class="n">observation_data</span><span class="o">=</span><span class="n">observation_data</span><span class="p">,</span>
+            <span class="n">optimization_config</span><span class="o">=</span><span class="n">optimization_config</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_hypervolume</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">objective_thresholds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TRefPoint</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">observation_features</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ObservationFeatures</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">observation_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ObservationData</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">optimization_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">OptimizationConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">"""Helper function that computes hypervolume of a given list of outcomes."""</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>  <span class="c1"># pragma: no cover</span>
+
+<div class="viewcode-block" id="ModelBridge.predicted_hypervolume"><a class="viewcode-back" href="../../../modelbridge.html#ax.modelbridge.base.ModelBridge.predicted_hypervolume">[docs]</a>    <span class="k">def</span> <span class="nf">predicted_hypervolume</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">objective_thresholds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TRefPoint</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">observation_features</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ObservationFeatures</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">optimization_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">OptimizationConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">"""Calculate hypervolume of a pareto frontier based on the posterior means of</span>
+<span class="sd">        given observation features.</span>
+
+<span class="sd">        Given a model and features to evaluate calculate the hypervolume of the pareto</span>
+<span class="sd">        frontier formed from their predicted outcomes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            objective_thresholds: point defining the origin of hyperrectangles that</span>
+<span class="sd">                can contribute to hypervolume.</span>
+<span class="sd">            observation_features: observation features to predict. Model's training</span>
+<span class="sd">                data used by default if unspecified.</span>
+<span class="sd">            optimization_config: Optimization config</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            calculated hypervolume.</span>
+<span class="sd">        """</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>  <span class="c1"># pragma: no cover</span></div>
+
+<div class="viewcode-block" id="ModelBridge.observed_hypervolume"><a class="viewcode-back" href="../../../modelbridge.html#ax.modelbridge.base.ModelBridge.observed_hypervolume">[docs]</a>    <span class="k">def</span> <span class="nf">observed_hypervolume</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">objective_thresholds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TRefPoint</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">optimization_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">OptimizationConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">"""Calculate hypervolume of a pareto frontier based on observed data.</span>
+
+<span class="sd">        Given observed data, return the hypervolume of the pareto frontier formed from</span>
+<span class="sd">        those outcomes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model: Model used to predict outcomes.</span>
+<span class="sd">            objective_thresholds: point defining the origin of hyperrectangles that</span>
+<span class="sd">                can contribute to hypervolume.</span>
+<span class="sd">            observation_features: observation features to predict. Model's training</span>
+<span class="sd">                data used by default if unspecified.</span>
+<span class="sd">            optimization_config: Optimization config</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (float) calculated hypervolume.</span>
+<span class="sd">        """</span>
+        <span class="c1"># Get observation_data from current training data.</span>
+        <span class="n">observation_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">obs</span><span class="o">.</span><span class="n">data</span> <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_training_data</span><span class="p">()]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hypervolume</span><span class="p">(</span>
+            <span class="n">objective_thresholds</span><span class="o">=</span><span class="n">objective_thresholds</span><span class="p">,</span>
+            <span class="n">observation_data</span><span class="o">=</span><span class="n">observation_data</span><span class="p">,</span>
+            <span class="n">optimization_config</span><span class="o">=</span><span class="n">optimization_config</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="unwrap_observation_data"><a class="viewcode-back" href="../../../modelbridge.html#ax.modelbridge.base.unwrap_observation_data">[docs]</a><span class="k">def</span> <span class="nf">unwrap_observation_data</span><span class="p">(</span><span class="n">observation_data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationData</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">TModelPredict</span><span class="p">:</span>

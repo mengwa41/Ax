@@ -139,6 +139,15 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="utils.html#ax.utils.stats.statstools.agresti_coull_sem">agresti_coull_sem() (in module ax.utils.stats.statstools)</a>
 </li>
+<li><a href="core.html#ax.core.optimization_config.MultiObjectiveOptimizationConfig.all_constraints">all_constraints() (ax.core.optimization_config.MultiObjectiveOptimizationConfig property)</a>
+<ul>
+<li><a href="core.html#ax.core.optimization_config.OptimizationConfig.all_constraints">(ax.core.optimization_config.OptimizationConfig property)</a>
+</li>
+<li><a href="ax.html#ax.MultiObjectiveOptimizationConfig.all_constraints">(ax.MultiObjectiveOptimizationConfig property)</a>
+</li>
+<li><a href="ax.html#ax.OptimizationConfig.all_constraints">(ax.OptimizationConfig property)</a>
+</li>
+</ul></li>
 <li><a href="ax.html#ax.Arm">Arm (class in ax)</a>
 <ul>
 <li><a href="core.html#ax.core.arm.Arm">(class in ax.core.arm)</a>
@@ -319,12 +328,12 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="metrics.html#module-ax.metrics.branin">ax.metrics.branin (module)</a>
 </li>
+</ul></td>
+<td style="width: 33%; vertical-align: top;"><ul>
 <li><a href="metrics.html#module-ax.metrics.factorial">ax.metrics.factorial (module)</a>
 </li>
 <li><a href="metrics.html#module-ax.metrics.hartmann6">ax.metrics.hartmann6 (module)</a>
 </li>
-</ul></td>
-<td style="width: 33%; vertical-align: top;"><ul>
 <li><a href="metrics.html#module-ax.metrics.l2norm">ax.metrics.l2norm (module)</a>
 </li>
 <li><a href="metrics.html#module-ax.metrics.noisy_function">ax.metrics.noisy_function (module)</a>
@@ -629,8 +638,6 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="models.html#ax.models.model_utils.best_observed_point">best_observed_point() (in module ax.models.model_utils)</a>
 </li>
-</ul></td>
-<td style="width: 33%; vertical-align: top;"><ul>
 <li><a href="models.html#ax.models.discrete_base.DiscreteModel.best_point">best_point() (ax.models.discrete_base.DiscreteModel method)</a>
 <ul>
 <li><a href="models.html#ax.models.numpy_base.NumpyModel.best_point">(ax.models.numpy_base.NumpyModel method)</a>
@@ -640,6 +647,8 @@ src="/js/documentation_options.js">
 <li><a href="models.html#ax.models.torch_base.TorchModel.best_point">(ax.models.torch_base.TorchModel method)</a>
 </li>
 </ul></li>
+</ul></td>
+<td style="width: 33%; vertical-align: top;"><ul>
 <li><a href="core.html#ax.core.parameter.ParameterType.BOOL">BOOL (ax.core.parameter.ParameterType attribute)</a>
 </li>
 <li><a href="modelbridge.html#ax.modelbridge.registry.Models.BOTORCH">BOTORCH (ax.modelbridge.registry.Models attribute)</a>
@@ -652,8 +661,12 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="models.html#ax.models.torch.botorch.BotorchModel">BotorchModel (class in ax.models.torch.botorch)</a>
 </li>
-<li><a href="core.html#ax.core.outcome_constraint.OutcomeConstraint.bound">bound (ax.core.outcome_constraint.OutcomeConstraint attribute)</a>
+<li><a href="core.html#ax.core.outcome_constraint.ObjectiveThreshold.bound">bound (ax.core.outcome_constraint.ObjectiveThreshold attribute)</a>
 <ul>
+<li><a href="core.html#ax.core.outcome_constraint.OutcomeConstraint.bound">(ax.core.outcome_constraint.OutcomeConstraint attribute)</a>
+</li>
+<li><a href="ax.html#ax.ObjectiveThreshold.bound">(ax.ObjectiveThreshold attribute)</a>
+</li>
 <li><a href="ax.html#ax.OutcomeConstraint.bound">(ax.OutcomeConstraint attribute)</a>
 </li>
 <li><a href="storage.html#ax.storage.sqa_store.sqa_classes.SQAMetric.bound">(ax.storage.sqa_store.sqa_classes.SQAMetric attribute)</a>
@@ -784,6 +797,8 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="core.html#ax.core.optimization_config.OptimizationConfig.clone">(ax.core.optimization_config.OptimizationConfig method)</a>
 </li>
+<li><a href="core.html#ax.core.outcome_constraint.ObjectiveThreshold.clone">(ax.core.outcome_constraint.ObjectiveThreshold method)</a>
+</li>
 <li><a href="core.html#ax.core.outcome_constraint.OutcomeConstraint.clone">(ax.core.outcome_constraint.OutcomeConstraint method)</a>
 </li>
 <li><a href="core.html#ax.core.parameter.ChoiceParameter.clone">(ax.core.parameter.ChoiceParameter method)</a>
@@ -810,7 +825,11 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="metrics.html#ax.metrics.noisy_function.NoisyFunctionMetric.clone">(ax.metrics.noisy_function.NoisyFunctionMetric method)</a>
 </li>
+<li><a href="ax.html#ax.MultiObjective.clone">(ax.MultiObjective method)</a>
+</li>
 <li><a href="ax.html#ax.Objective.clone">(ax.Objective method)</a>
+</li>
+<li><a href="ax.html#ax.ObjectiveThreshold.clone">(ax.ObjectiveThreshold method)</a>
 </li>
 <li><a href="ax.html#ax.OptimizationConfig.clone">(ax.OptimizationConfig method)</a>
 </li>
@@ -825,6 +844,15 @@ src="/js/documentation_options.js">
 </ul></li>
 <li><a href="modelbridge.html#ax.modelbridge.generation_strategy.GenerationStrategy.clone_reset">clone_reset() (ax.modelbridge.generation_strategy.GenerationStrategy method)</a>
 </li>
+<li><a href="core.html#ax.core.optimization_config.MultiObjectiveOptimizationConfig.clone_with_args">clone_with_args() (ax.core.optimization_config.MultiObjectiveOptimizationConfig method)</a>
+<ul>
+<li><a href="core.html#ax.core.optimization_config.OptimizationConfig.clone_with_args">(ax.core.optimization_config.OptimizationConfig method)</a>
+</li>
+<li><a href="ax.html#ax.MultiObjectiveOptimizationConfig.clone_with_args">(ax.MultiObjectiveOptimizationConfig method)</a>
+</li>
+<li><a href="ax.html#ax.OptimizationConfig.clone_with_args">(ax.OptimizationConfig method)</a>
+</li>
+</ul></li>
 <li><a href="core.html#ax.core.parameter_constraint.OrderConstraint.clone_with_transformed_parameters">clone_with_transformed_parameters() (ax.core.parameter_constraint.OrderConstraint method)</a>
 <ul>
 <li><a href="core.html#ax.core.parameter_constraint.ParameterConstraint.clone_with_transformed_parameters">(ax.core.parameter_constraint.ParameterConstraint method)</a>
@@ -838,6 +866,8 @@ src="/js/documentation_options.js">
 <li><a href="ax.html#ax.SumConstraint.clone_with_transformed_parameters">(ax.SumConstraint method)</a>
 </li>
 </ul></li>
+</ul></td>
+<td style="width: 33%; vertical-align: top;"><ul>
 <li><a href="core.html#ax.core.data.clone_without_metrics">clone_without_metrics() (in module ax.core.data)</a>
 </li>
 <li><a href="utils.html#ax.utils.tutorials.cnn_utils.CNN">CNN (class in ax.utils.tutorials.cnn_utils)</a>
@@ -847,8 +877,6 @@ src="/js/documentation_options.js">
 <li><a href="plot.html#ax.plot.pareto_utils.COLORS">(class in ax.plot.pareto_utils)</a>
 </li>
 </ul></li>
-</ul></td>
-<td style="width: 33%; vertical-align: top;"><ul>
 <li><a href="core.html#ax.core.data.Data.column_data_types">column_data_types() (ax.core.data.Data static method)</a>
 <ul>
 <li><a href="ax.html#ax.Data.column_data_types">(ax.Data static method)</a>
@@ -1274,11 +1302,13 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="utils.html#ax.utils.common.serialization.extract_init_args">extract_init_args() (in module ax.utils.common.serialization)</a>
 </li>
-<li><a href="modelbridge.html#ax.modelbridge.array.extract_objective_weights">extract_objective_weights() (in module ax.modelbridge.array)</a>
+<li><a href="modelbridge.html#ax.modelbridge.modelbridge_utils.extract_objective_thresholds">extract_objective_thresholds() (in module ax.modelbridge.modelbridge_utils)</a>
+</li>
+<li><a href="modelbridge.html#ax.modelbridge.modelbridge_utils.extract_objective_weights">extract_objective_weights() (in module ax.modelbridge.modelbridge_utils)</a>
 </li>
 <li><a href="benchmark.html#ax.benchmark.benchmark_result.extract_optimization_trace">extract_optimization_trace() (in module ax.benchmark.benchmark_result)</a>
 </li>
-<li><a href="modelbridge.html#ax.modelbridge.array.extract_outcome_constraints">extract_outcome_constraints() (in module ax.modelbridge.array)</a>
+<li><a href="modelbridge.html#ax.modelbridge.modelbridge_utils.extract_outcome_constraints">extract_outcome_constraints() (in module ax.modelbridge.modelbridge_utils)</a>
 </li>
 <li><a href="modelbridge.html#ax.modelbridge.modelbridge_utils.extract_parameter_constraints">extract_parameter_constraints() (in module ax.modelbridge.modelbridge_utils)</a>
 </li>
@@ -1655,6 +1685,8 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="utils.html#ax.utils.testing.core_stubs.get_branin_data">get_branin_data() (in module ax.utils.testing.core_stubs)</a>
 </li>
+<li><a href="utils.html#ax.utils.testing.core_stubs.get_branin_data_batch">get_branin_data_batch() (in module ax.utils.testing.core_stubs)</a>
+</li>
 <li><a href="utils.html#ax.utils.testing.core_stubs.get_branin_data_multi_objective">get_branin_data_multi_objective() (in module ax.utils.testing.core_stubs)</a>
 </li>
 <li><a href="utils.html#ax.utils.testing.core_stubs.get_branin_experiment">get_branin_experiment() (in module ax.utils.testing.core_stubs)</a>
@@ -1696,12 +1728,12 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="storage.html#ax.storage.sqa_store.db.get_engine">get_engine() (in module ax.storage.sqa_store.db)</a>
 </li>
-</ul></td>
-<td style="width: 33%; vertical-align: top;"><ul>
 <li><a href="storage.html#ax.storage.sqa_store.decoder.Decoder.get_enum_name">get_enum_name() (ax.storage.sqa_store.decoder.Decoder method)</a>
 </li>
 <li><a href="storage.html#ax.storage.sqa_store.encoder.Encoder.get_enum_value">get_enum_value() (ax.storage.sqa_store.encoder.Encoder method)</a>
 </li>
+</ul></td>
+<td style="width: 33%; vertical-align: top;"><ul>
 <li><a href="utils.html#ax.utils.testing.core_stubs.get_experiment">get_experiment() (in module ax.utils.testing.core_stubs)</a>
 </li>
 <li><a href="utils.html#ax.utils.testing.modeling_stubs.get_experiment_for_value">get_experiment_for_value() (in module ax.utils.testing.modeling_stubs)</a>
@@ -1762,6 +1794,8 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="utils.html#ax.utils.testing.core_stubs.get_hartmann_search_space">get_hartmann_search_space() (in module ax.utils.testing.core_stubs)</a>
 </li>
+<li><a href="utils.html#ax.utils.testing.core_stubs.get_list_surrogate">get_list_surrogate() (in module ax.utils.testing.core_stubs)</a>
+</li>
 <li><a href="utils.html#ax.utils.common.logger.get_logger">get_logger() (in module ax.utils.common.logger)</a>
 </li>
 <li><a href="service.html#ax.service.ax_client.AxClient.get_max_parallelism">get_max_parallelism() (ax.service.ax_client.AxClient method)</a>
@@ -1808,6 +1842,8 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="utils.html#ax.utils.testing.core_stubs.get_multi_objective">get_multi_objective() (in module ax.utils.testing.core_stubs)</a>
 </li>
+<li><a href="utils.html#ax.utils.testing.core_stubs.get_multi_objective_optimization_config">get_multi_objective_optimization_config() (in module ax.utils.testing.core_stubs)</a>
+</li>
 <li><a href="utils.html#ax.utils.testing.core_stubs.get_multi_type_experiment">get_multi_type_experiment() (in module ax.utils.testing.core_stubs)</a>
 </li>
 <li><a href="models.html#ax.models.torch.botorch_defaults.get_NEI">get_NEI() (in module ax.models.torch.botorch_defaults)</a>
@@ -1815,6 +1851,8 @@ src="/js/documentation_options.js">
 <li><a href="service.html#ax.service.ax_client.AxClient.get_next_trial">get_next_trial() (ax.service.ax_client.AxClient method)</a>
 </li>
 <li><a href="utils.html#ax.utils.testing.core_stubs.get_objective">get_objective() (in module ax.utils.testing.core_stubs)</a>
+</li>
+<li><a href="utils.html#ax.utils.testing.core_stubs.get_objective_threshold">get_objective_threshold() (in module ax.utils.testing.core_stubs)</a>
 </li>
 <li><a href="utils.html#ax.utils.testing.modeling_stubs.get_observation">get_observation() (in module ax.utils.testing.modeling_stubs)</a>
 </li>
@@ -1920,6 +1958,8 @@ src="/js/documentation_options.js">
 <ul>
 <li><a href="core.html#ax.core.objective.Objective.get_unconstrainable_metrics">(ax.core.objective.Objective method)</a>
 </li>
+<li><a href="ax.html#ax.MultiObjective.get_unconstrainable_metrics">(ax.MultiObjective method)</a>
+</li>
 <li><a href="ax.html#ax.Objective.get_unconstrainable_metrics">(ax.Objective method)</a>
 </li>
 </ul></li>
@@ -1965,8 +2005,6 @@ src="/js/documentation_options.js">
 </li>
 </ul></li>
 <li><a href="plot.html#ax.plot.base.AxPlotTypes.HTML">HTML (ax.plot.base.AxPlotTypes attribute)</a>
-</li>
-<li><a href="modelbridge.html#ax.modelbridge.multi_objective_torch.MultiObjectiveTorchModelBridge.hypervolume">hypervolume() (ax.modelbridge.multi_objective_torch.MultiObjectiveTorchModelBridge method)</a>
 </li>
 </ul></td>
 </tr></table>
@@ -2312,6 +2350,8 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="benchmark.html#ax.benchmark.benchmark_result.make_plots">make_plots() (in module ax.benchmark.benchmark_result)</a>
 </li>
+<li><a href="core.html#ax.core.optimization_config.make_wrong_direction_warning">make_wrong_direction_warning() (in module ax.core.optimization_config)</a>
+</li>
 <li><a href="core.html#ax.core.generator_run.GeneratorRunType.MANUAL">MANUAL (ax.core.generator_run.GeneratorRunType attribute)</a>
 </li>
 <li><a href="utils.html#ax.utils.stats.statstools.marginal_effects">marginal_effects() (in module ax.utils.stats.statstools)</a>
@@ -2352,8 +2392,12 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="core.html#ax.core.types.merge_model_predict">merge_model_predict() (in module ax.core.types)</a>
 </li>
-<li><a href="core.html#ax.core.outcome_constraint.OutcomeConstraint.metric">metric (ax.core.outcome_constraint.OutcomeConstraint attribute)</a>
+<li><a href="core.html#ax.core.outcome_constraint.ObjectiveThreshold.metric">metric (ax.core.outcome_constraint.ObjectiveThreshold attribute)</a>
 <ul>
+<li><a href="core.html#ax.core.outcome_constraint.OutcomeConstraint.metric">(ax.core.outcome_constraint.OutcomeConstraint attribute)</a>
+</li>
+<li><a href="ax.html#ax.ObjectiveThreshold.metric">(ax.ObjectiveThreshold attribute)</a>
+</li>
 <li><a href="ax.html#ax.OutcomeConstraint.metric">(ax.OutcomeConstraint attribute)</a>
 </li>
 </ul></li>
@@ -2367,6 +2411,8 @@ src="/js/documentation_options.js">
 <li><a href="core.html#ax.core.objective.Objective.metric">(ax.core.objective.Objective property)</a>
 </li>
 <li><a href="core.html#ax.core.outcome_constraint.OutcomeConstraint.metric">(ax.core.outcome_constraint.OutcomeConstraint property)</a>
+</li>
+<li><a href="ax.html#ax.MultiObjective.metric">(ax.MultiObjective property)</a>
 </li>
 <li><a href="ax.html#ax.Objective.metric">(ax.Objective property)</a>
 </li>
@@ -2390,12 +2436,17 @@ src="/js/documentation_options.js">
 <li><a href="storage.html#ax.storage.sqa_store.sqa_classes.SQAMetric.metric_type">metric_type (ax.storage.sqa_store.sqa_classes.SQAMetric attribute)</a>
 </li>
 <li><a href="core.html#ax.core.objective.MultiObjective.metric_weights">metric_weights() (ax.core.objective.MultiObjective property)</a>
+<ul>
+<li><a href="ax.html#ax.MultiObjective.metric_weights">(ax.MultiObjective property)</a>
 </li>
+</ul></li>
 <li><a href="storage.html#ax.storage.utils.MetricIntent">MetricIntent (class in ax.storage.utils)</a>
 </li>
 <li><a href="core.html#ax.core.objective.MultiObjective.metrics">metrics (ax.core.objective.MultiObjective attribute)</a>
 <ul>
 <li><a href="core.html#ax.core.objective.ScalarizedObjective.metrics">(ax.core.objective.ScalarizedObjective attribute)</a>
+</li>
+<li><a href="ax.html#ax.MultiObjective.metrics">(ax.MultiObjective attribute)</a>
 </li>
 <li><a href="storage.html#ax.storage.sqa_store.sqa_classes.SQAExperiment.metrics">(ax.storage.sqa_store.sqa_classes.SQAExperiment attribute)</a>
 </li>
@@ -2408,9 +2459,13 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="core.html#ax.core.objective.Objective.metrics">(ax.core.objective.Objective property)</a>
 </li>
+<li><a href="core.html#ax.core.optimization_config.MultiObjectiveOptimizationConfig.metrics">(ax.core.optimization_config.MultiObjectiveOptimizationConfig property)</a>
+</li>
 <li><a href="core.html#ax.core.optimization_config.OptimizationConfig.metrics">(ax.core.optimization_config.OptimizationConfig property)</a>
 </li>
 <li><a href="ax.html#ax.Experiment.metrics">(ax.Experiment property)</a>
+</li>
+<li><a href="ax.html#ax.MultiObjective.metrics">(ax.MultiObjective property)</a>
 </li>
 <li><a href="ax.html#ax.Objective.metrics">(ax.Objective property)</a>
 </li>
@@ -2520,8 +2575,16 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="storage.html#ax.storage.json_store.encoders.multi_type_experiment_to_dict">multi_type_experiment_to_dict() (in module ax.storage.json_store.encoders)</a>
 </li>
-<li><a href="core.html#ax.core.objective.MultiObjective">MultiObjective (class in ax.core.objective)</a>
+<li><a href="ax.html#ax.MultiObjective">MultiObjective (class in ax)</a>
+<ul>
+<li><a href="core.html#ax.core.objective.MultiObjective">(class in ax.core.objective)</a>
 </li>
+</ul></li>
+<li><a href="ax.html#ax.MultiObjectiveOptimizationConfig">MultiObjectiveOptimizationConfig (class in ax)</a>
+<ul>
+<li><a href="core.html#ax.core.optimization_config.MultiObjectiveOptimizationConfig">(class in ax.core.optimization_config)</a>
+</li>
+</ul></li>
 <li><a href="modelbridge.html#ax.modelbridge.multi_objective_torch.MultiObjectiveTorchModelBridge">MultiObjectiveTorchModelBridge (class in ax.modelbridge.multi_objective_torch)</a>
 </li>
 <li><a href="core.html#ax.core.multi_type_experiment.MultiTypeExperiment">MultiTypeExperiment (class in ax.core.multi_type_experiment)</a>
@@ -2667,9 +2730,13 @@ src="/js/documentation_options.js">
 <li><a href="core.html#ax.core.objective.Objective">(class in ax.core.objective)</a>
 </li>
 </ul></li>
-<li><a href="core.html#ax.core.optimization_config.OptimizationConfig.objective">objective() (ax.core.optimization_config.OptimizationConfig property)</a>
+<li><a href="core.html#ax.core.optimization_config.MultiObjectiveOptimizationConfig.objective">objective() (ax.core.optimization_config.MultiObjectiveOptimizationConfig property)</a>
 <ul>
+<li><a href="core.html#ax.core.optimization_config.OptimizationConfig.objective">(ax.core.optimization_config.OptimizationConfig property)</a>
+</li>
 <li><a href="core.html#ax.core.utils.MissingMetrics.objective">(ax.core.utils.MissingMetrics property)</a>
+</li>
+<li><a href="ax.html#ax.MultiObjectiveOptimizationConfig.objective">(ax.MultiObjectiveOptimizationConfig property)</a>
 </li>
 <li><a href="ax.html#ax.OptimizationConfig.objective">(ax.OptimizationConfig property)</a>
 </li>
@@ -2683,11 +2750,27 @@ src="/js/documentation_options.js">
 </ul></li>
 <li><a href="service.html#ax.service.ax_client.AxClient.objective_name">objective_name() (ax.service.ax_client.AxClient property)</a>
 </li>
+<li><a href="storage.html#ax.storage.utils.MetricIntent.OBJECTIVE_THRESHOLD">OBJECTIVE_THRESHOLD (ax.storage.utils.MetricIntent attribute)</a>
+</li>
+<li><a href="storage.html#ax.storage.sqa_store.encoder.Encoder.objective_threshold_to_sqa">objective_threshold_to_sqa() (ax.storage.sqa_store.encoder.Encoder method)</a>
+</li>
+<li><a href="core.html#ax.core.optimization_config.MultiObjectiveOptimizationConfig.objective_thresholds">objective_thresholds() (ax.core.optimization_config.MultiObjectiveOptimizationConfig property)</a>
+<ul>
+<li><a href="ax.html#ax.MultiObjectiveOptimizationConfig.objective_thresholds">(ax.MultiObjectiveOptimizationConfig property)</a>
+</li>
+</ul></li>
 <li><a href="storage.html#ax.storage.json_store.encoders.objective_to_dict">objective_to_dict() (in module ax.storage.json_store.encoders)</a>
 </li>
 <li><a href="storage.html#ax.storage.sqa_store.encoder.Encoder.objective_to_sqa">objective_to_sqa() (ax.storage.sqa_store.encoder.Encoder method)</a>
 </li>
+<li><a href="ax.html#ax.ObjectiveThreshold">ObjectiveThreshold (class in ax)</a>
+<ul>
+<li><a href="core.html#ax.core.outcome_constraint.ObjectiveThreshold">(class in ax.core.outcome_constraint)</a>
+</li>
+</ul></li>
 <li><a href="core.html#ax.core.observation.Observation">Observation (class in ax.core.observation)</a>
+</li>
+<li><a href="modelbridge.html#ax.modelbridge.array.observation_data_to_array">observation_data_to_array() (in module ax.modelbridge.array)</a>
 </li>
 <li><a href="storage.html#ax.storage.json_store.encoders.observation_features_to_dict">observation_features_to_dict() (in module ax.storage.json_store.encoders)</a>
 </li>
@@ -2699,16 +2782,20 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="modelbridge.html#ax.modelbridge.cross_validation.CVResult.observed">observed() (ax.modelbridge.cross_validation.CVResult property)</a>
 </li>
-<li><a href="modelbridge.html#ax.modelbridge.multi_objective_torch.MultiObjectiveTorchModelBridge.observed_hypervolume">observed_hypervolume() (ax.modelbridge.multi_objective_torch.MultiObjectiveTorchModelBridge method)</a>
+<li><a href="modelbridge.html#ax.modelbridge.base.ModelBridge.observed_hypervolume">observed_hypervolume() (ax.modelbridge.base.ModelBridge method)</a>
 </li>
-<li><a href="modelbridge.html#ax.modelbridge.multi_objective_torch.MultiObjectiveTorchModelBridge.observed_pareto_frontier">observed_pareto_frontier() (ax.modelbridge.multi_objective_torch.MultiObjectiveTorchModelBridge method)</a>
+<li><a href="modelbridge.html#ax.modelbridge.base.ModelBridge.observed_pareto_frontier">observed_pareto_frontier() (ax.modelbridge.base.ModelBridge method)</a>
 </li>
 <li><a href="modelbridge.html#ax.modelbridge.transforms.one_hot.OneHot">OneHot (class in ax.modelbridge.transforms.one_hot)</a>
 </li>
 <li><a href="modelbridge.html#ax.modelbridge.transforms.one_hot.OneHotEncoder">OneHotEncoder (class in ax.modelbridge.transforms.one_hot)</a>
 </li>
-<li><a href="core.html#ax.core.outcome_constraint.OutcomeConstraint.op">op (ax.core.outcome_constraint.OutcomeConstraint attribute)</a>
+<li><a href="core.html#ax.core.outcome_constraint.ObjectiveThreshold.op">op (ax.core.outcome_constraint.ObjectiveThreshold attribute)</a>
 <ul>
+<li><a href="core.html#ax.core.outcome_constraint.OutcomeConstraint.op">(ax.core.outcome_constraint.OutcomeConstraint attribute)</a>
+</li>
+<li><a href="ax.html#ax.ObjectiveThreshold.op">(ax.ObjectiveThreshold attribute)</a>
+</li>
 <li><a href="ax.html#ax.OutcomeConstraint.op">(ax.OutcomeConstraint attribute)</a>
 </li>
 <li><a href="storage.html#ax.storage.sqa_store.sqa_classes.SQAMetric.op">(ax.storage.sqa_store.sqa_classes.SQAMetric attribute)</a>
@@ -2723,6 +2810,8 @@ src="/js/documentation_options.js">
 </ul></li>
 <li><a href="storage.html#ax.storage.sqa_store.decoder.Decoder.opt_config_and_tracking_metrics_from_sqa">opt_config_and_tracking_metrics_from_sqa() (ax.storage.sqa_store.decoder.Decoder method)</a>
 </li>
+</ul></td>
+<td style="width: 33%; vertical-align: top;"><ul>
 <li><a href="benchmark.html#ax.benchmark.benchmark_problem.BenchmarkProblem.optimal_value">optimal_value (ax.benchmark.benchmark_problem.BenchmarkProblem attribute)</a>
 <ul>
 <li><a href="benchmark.html#ax.benchmark.benchmark_problem.SimpleBenchmarkProblem.optimal_value">(ax.benchmark.benchmark_problem.SimpleBenchmarkProblem attribute)</a>
@@ -2739,8 +2828,6 @@ src="/js/documentation_options.js">
 <li><a href="ax.html#ax.GeneratorRun.optimization_config">(ax.GeneratorRun property)</a>
 </li>
 </ul></li>
-</ul></td>
-<td style="width: 33%; vertical-align: top;"><ul>
 <li><a href="storage.html#ax.storage.json_store.encoders.optimization_config_to_dict">optimization_config_to_dict() (in module ax.storage.json_store.encoders)</a>
 </li>
 <li><a href="storage.html#ax.storage.sqa_store.encoder.Encoder.optimization_config_to_sqa">optimization_config_to_sqa() (ax.storage.sqa_store.encoder.Encoder method)</a>
@@ -2825,8 +2912,6 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="modelbridge.html#ax.modelbridge.numpy.NumpyModelBridge.outcomes">(ax.modelbridge.numpy.NumpyModelBridge attribute)</a>
 </li>
-<li><a href="modelbridge.html#ax.modelbridge.torch.TorchModelBridge.outcomes">(ax.modelbridge.torch.TorchModelBridge attribute)</a>
-</li>
 </ul></li>
 </ul></td>
 </tr></table>
@@ -2896,8 +2981,6 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="modelbridge.html#ax.modelbridge.random.RandomModelBridge.parameters">(ax.modelbridge.random.RandomModelBridge attribute)</a>, <a href="modelbridge.html#ax.modelbridge.random.RandomModelBridge.parameters">[1]</a>
 </li>
-<li><a href="modelbridge.html#ax.modelbridge.torch.TorchModelBridge.parameters">(ax.modelbridge.torch.TorchModelBridge attribute)</a>
-</li>
 <li><a href="storage.html#ax.storage.sqa_store.sqa_classes.SQAArm.parameters">(ax.storage.sqa_store.sqa_classes.SQAArm attribute)</a>
 </li>
 <li><a href="storage.html#ax.storage.sqa_store.sqa_classes.SQAExperiment.parameters">(ax.storage.sqa_store.sqa_classes.SQAExperiment attribute)</a>
@@ -2933,14 +3016,10 @@ src="/js/documentation_options.js">
 <li><a href="core.html#ax.core.parameter.ParameterType">(class in ax.core.parameter)</a>
 </li>
 </ul></li>
-<li><a href="modelbridge.html#ax.modelbridge.multi_objective_torch.MultiObjectiveTorchModelBridge.pareto_frontier">pareto_frontier() (ax.modelbridge.multi_objective_torch.MultiObjectiveTorchModelBridge method)</a>
-</li>
 <li><a href="plot.html#ax.plot.pareto_utils.ParetoFrontierResults">ParetoFrontierResults (class in ax.plot.pareto_utils)</a>
 </li>
 <li><a href="modelbridge.html#ax.modelbridge.modelbridge_utils.parse_observation_features">parse_observation_features() (in module ax.modelbridge.modelbridge_utils)</a>
 </li>
-</ul></td>
-<td style="width: 33%; vertical-align: top;"><ul>
 <li><a href="modelbridge.html#ax.modelbridge.modelbridge_utils.pending_observations_as_array">pending_observations_as_array() (in module ax.modelbridge.modelbridge_utils)</a>
 </li>
 <li><a href="models.html#ax.models.torch.utils.pick_best_out_of_sample_point_acqf_class">pick_best_out_of_sample_point_acqf_class() (in module ax.models.torch.utils)</a>
@@ -2950,6 +3029,8 @@ src="/js/documentation_options.js">
 <li><a href="plot.html#ax.plot.pareto_utils.COLORS.PINK">(ax.plot.pareto_utils.COLORS attribute)</a>
 </li>
 </ul></li>
+</ul></td>
+<td style="width: 33%; vertical-align: top;"><ul>
 <li><a href="plot.html#ax.plot.bandit_rollout.plot_bandit_rollout">plot_bandit_rollout() (in module ax.plot.bandit_rollout)</a>
 </li>
 <li><a href="plot.html#ax.plot.render.plot_config_to_html">plot_config_to_html() (in module ax.plot.render)</a>
@@ -3009,6 +3090,16 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="modelbridge.html#ax.modelbridge.cross_validation.CVResult.predicted">predicted() (ax.modelbridge.cross_validation.CVResult property)</a>
 </li>
+<li><a href="modelbridge.html#ax.modelbridge.array.ArrayModelBridge.predicted_hypervolume">predicted_hypervolume() (ax.modelbridge.array.ArrayModelBridge method)</a>
+<ul>
+<li><a href="modelbridge.html#ax.modelbridge.base.ModelBridge.predicted_hypervolume">(ax.modelbridge.base.ModelBridge method)</a>
+</li>
+</ul></li>
+<li><a href="modelbridge.html#ax.modelbridge.array.ArrayModelBridge.predicted_pareto_frontier">predicted_pareto_frontier() (ax.modelbridge.array.ArrayModelBridge method)</a>
+<ul>
+<li><a href="modelbridge.html#ax.modelbridge.base.ModelBridge.predicted_pareto_frontier">(ax.modelbridge.base.ModelBridge method)</a>
+</li>
+</ul></li>
 <li><a href="plot.html#ax.plot.pareto_utils.ParetoFrontierResults.primary_metric">primary_metric() (ax.plot.pareto_utils.ParetoFrontierResults property)</a>
 </li>
 <li><a href="storage.html#ax.storage.sqa_store.json.JSONEncodedObject.process_bind_param">process_bind_param() (ax.storage.sqa_store.json.JSONEncodedObject method)</a>
@@ -3093,8 +3184,12 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="plot.html#ax.plot.base.PlotMetric.rel">rel() (ax.plot.base.PlotMetric property)</a>
 </li>
-<li><a href="core.html#ax.core.outcome_constraint.OutcomeConstraint.relative">relative (ax.core.outcome_constraint.OutcomeConstraint attribute)</a>
+<li><a href="core.html#ax.core.outcome_constraint.ObjectiveThreshold.relative">relative (ax.core.outcome_constraint.ObjectiveThreshold attribute)</a>
 <ul>
+<li><a href="core.html#ax.core.outcome_constraint.OutcomeConstraint.relative">(ax.core.outcome_constraint.OutcomeConstraint attribute)</a>
+</li>
+<li><a href="ax.html#ax.ObjectiveThreshold.relative">(ax.ObjectiveThreshold attribute)</a>
+</li>
 <li><a href="ax.html#ax.OutcomeConstraint.relative">(ax.OutcomeConstraint attribute)</a>
 </li>
 <li><a href="storage.html#ax.storage.sqa_store.sqa_classes.SQAMetric.relative">(ax.storage.sqa_store.sqa_classes.SQAMetric attribute)</a>
@@ -3123,10 +3218,10 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="utils.html#ax.utils.notebook.plotting.render">render() (in module ax.utils.notebook.plotting)</a>
 </li>
-<li><a href="utils.html#ax.utils.report.render.render_report_elements">render_report_elements() (in module ax.utils.report.render)</a>
-</li>
 </ul></td>
 <td style="width: 33%; vertical-align: top;"><ul>
+<li><a href="utils.html#ax.utils.report.render.render_report_elements">render_report_elements() (in module ax.utils.report.render)</a>
+</li>
 <li><a href="core.html#ax.core.data.Data.required_columns">required_columns() (ax.core.data.Data static method)</a>
 <ul>
 <li><a href="ax.html#ax.Data.required_columns">(ax.Data static method)</a>
@@ -3604,8 +3699,10 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="modelbridge.html#ax.modelbridge.modelbridge_utils.transform_callback">transform_callback() (in module ax.modelbridge.modelbridge_utils)</a>
 </li>
-<li><a href="modelbridge.html#ax.modelbridge.transforms.base.Transform.transform_observation_data">transform_observation_data() (ax.modelbridge.transforms.base.Transform method)</a>
+<li><a href="modelbridge.html#ax.modelbridge.base.ModelBridge.transform_observation_data">transform_observation_data() (ax.modelbridge.base.ModelBridge method)</a>
 <ul>
+<li><a href="modelbridge.html#ax.modelbridge.transforms.base.Transform.transform_observation_data">(ax.modelbridge.transforms.base.Transform method)</a>
+</li>
 <li><a href="modelbridge.html#ax.modelbridge.transforms.convert_metric_names.ConvertMetricNames.transform_observation_data">(ax.modelbridge.transforms.convert_metric_names.ConvertMetricNames method)</a>
 </li>
 <li><a href="modelbridge.html#ax.modelbridge.transforms.ivw.IVW.transform_observation_data">(ax.modelbridge.transforms.ivw.IVW method)</a>
@@ -3650,8 +3747,10 @@ src="/js/documentation_options.js">
 </ul></li>
 </ul></td>
 <td style="width: 33%; vertical-align: top;"><ul>
-<li><a href="modelbridge.html#ax.modelbridge.transforms.base.Transform.transform_optimization_config">transform_optimization_config() (ax.modelbridge.transforms.base.Transform method)</a>
+<li><a href="modelbridge.html#ax.modelbridge.base.ModelBridge.transform_optimization_config">transform_optimization_config() (ax.modelbridge.base.ModelBridge method)</a>
 <ul>
+<li><a href="modelbridge.html#ax.modelbridge.transforms.base.Transform.transform_optimization_config">(ax.modelbridge.transforms.base.Transform method)</a>
+</li>
 <li><a href="modelbridge.html#ax.modelbridge.transforms.derelativize.Derelativize.transform_optimization_config">(ax.modelbridge.transforms.derelativize.Derelativize method)</a>
 </li>
 <li><a href="modelbridge.html#ax.modelbridge.transforms.standardize_y.StandardizeY.transform_optimization_config">(ax.modelbridge.transforms.standardize_y.StandardizeY method)</a>
@@ -3938,6 +4037,8 @@ src="/js/documentation_options.js">
 <li><a href="ax.html#ax.RangeParameter.validate">(ax.RangeParameter method)</a>
 </li>
 </ul></li>
+<li><a href="modelbridge.html#ax.modelbridge.modelbridge_utils.validate_and_apply_final_transform">validate_and_apply_final_transform() (in module ax.modelbridge.modelbridge_utils)</a>
+</li>
 <li><a href="models.html#ax.models.model_utils.validate_bounds">validate_bounds() (in module ax.models.model_utils)</a>
 </li>
 <li><a href="core.html#ax.core.parameter_constraint.validate_constraint_parameters">validate_constraint_parameters() (in module ax.core.parameter_constraint)</a>

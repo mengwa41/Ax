@@ -46,8 +46,11 @@ src="/js/documentation_options.js">
 <span class="kn">from</span> <span class="nn">ax.core.metric</span> <span class="kn">import</span> <span class="n">Metric</span>
 <span class="kn">from</span> <span class="nn">ax.core.multi_type_experiment</span> <span class="kn">import</span> <span class="n">MultiTypeExperiment</span>
 <span class="kn">from</span> <span class="nn">ax.core.objective</span> <span class="kn">import</span> <span class="n">MultiObjective</span><span class="p">,</span> <span class="n">Objective</span><span class="p">,</span> <span class="n">ScalarizedObjective</span>
-<span class="kn">from</span> <span class="nn">ax.core.optimization_config</span> <span class="kn">import</span> <span class="n">OptimizationConfig</span>
-<span class="kn">from</span> <span class="nn">ax.core.outcome_constraint</span> <span class="kn">import</span> <span class="n">OutcomeConstraint</span>
+<span class="kn">from</span> <span class="nn">ax.core.optimization_config</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MultiObjectiveOptimizationConfig</span><span class="p">,</span>
+    <span class="n">OptimizationConfig</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">ax.core.outcome_constraint</span> <span class="kn">import</span> <span class="n">ObjectiveThreshold</span><span class="p">,</span> <span class="n">OutcomeConstraint</span>
 <span class="kn">from</span> <span class="nn">ax.core.parameter</span> <span class="kn">import</span> <span class="n">ChoiceParameter</span><span class="p">,</span> <span class="n">FixedParameter</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">,</span> <span class="n">RangeParameter</span>
 <span class="kn">from</span> <span class="nn">ax.core.parameter_constraint</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">OrderConstraint</span><span class="p">,</span>
@@ -526,6 +529,20 @@ src="/js/documentation_options.js">
                 <span class="n">op</span><span class="o">=</span><span class="n">metric_sqa</span><span class="o">.</span><span class="n">op</span><span class="p">,</span>
                 <span class="n">relative</span><span class="o">=</span><span class="n">metric_sqa</span><span class="o">.</span><span class="n">relative</span><span class="p">,</span>
             <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">metric_sqa</span><span class="o">.</span><span class="n">intent</span> <span class="o">==</span> <span class="n">MetricIntent</span><span class="o">.</span><span class="n">OBJECTIVE_THRESHOLD</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">metric_sqa</span><span class="o">.</span><span class="n">bound</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">metric_sqa</span><span class="o">.</span><span class="n">relative</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">SQADecodeError</span><span class="p">(</span>  <span class="c1"># pragma: no cover</span>
+                    <span class="s2">"Cannot decode SQAMetric to ObjectiveThreshold because "</span>
+                    <span class="s2">"bound, op, or relative is None."</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="n">ObjectiveThreshold</span><span class="p">(</span>
+                <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+                <span class="c1"># pyre-fixme[6]: Expected `float` for 2nd param but got</span>
+                <span class="c1">#  `Optional[float]`.</span>
+                <span class="n">bound</span><span class="o">=</span><span class="n">metric_sqa</span><span class="o">.</span><span class="n">bound</span><span class="p">,</span>
+                <span class="n">relative</span><span class="o">=</span><span class="n">metric_sqa</span><span class="o">.</span><span class="n">relative</span><span class="p">,</span>
+                <span class="n">op</span><span class="o">=</span><span class="n">metric_sqa</span><span class="o">.</span><span class="n">op</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">SQADecodeError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">"Cannot decode SQAMetric because </span><span class="si">{</span><span class="n">metric_sqa</span><span class="o">.</span><span class="n">intent</span><span class="si">}</span><span class="s2"> "</span>
@@ -539,12 +556,15 @@ src="/js/documentation_options.js">
 <span class="sd">        and tracking metrics.</span>
 <span class="sd">        """</span>
         <span class="n">objective</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">objective_thresholds</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">outcome_constraints</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">tracking_metrics</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">metric_sqa</span> <span class="ow">in</span> <span class="n">metrics_sqa</span><span class="p">:</span>
             <span class="n">metric</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">metric_from_sqa</span><span class="p">(</span><span class="n">metric_sqa</span><span class="o">=</span><span class="n">metric_sqa</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metric</span><span class="p">,</span> <span class="n">Objective</span><span class="p">):</span>
                 <span class="n">objective</span> <span class="o">=</span> <span class="n">metric</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metric</span><span class="p">,</span> <span class="n">ObjectiveThreshold</span><span class="p">):</span>
+                <span class="n">objective_thresholds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metric</span><span class="p">,</span> <span class="n">OutcomeConstraint</span><span class="p">):</span>
                 <span class="n">outcome_constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -553,12 +573,17 @@ src="/js/documentation_options.js">
         <span class="k">if</span> <span class="n">objective</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">tracking_metrics</span>
 
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="n">OptimizationConfig</span><span class="p">(</span>
+        <span class="k">if</span> <span class="n">objective_thresholds</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">objective</span><span class="p">)</span> <span class="o">==</span> <span class="n">MultiObjective</span><span class="p">:</span>
+            <span class="n">optimization_config</span> <span class="o">=</span> <span class="n">MultiObjectiveOptimizationConfig</span><span class="p">(</span>
+                <span class="n">objective</span><span class="o">=</span><span class="n">objective</span><span class="p">,</span>
+                <span class="n">outcome_constraints</span><span class="o">=</span><span class="n">outcome_constraints</span><span class="p">,</span>
+                <span class="n">objective_thresholds</span><span class="o">=</span><span class="n">objective_thresholds</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">optimization_config</span> <span class="o">=</span> <span class="n">OptimizationConfig</span><span class="p">(</span>
                 <span class="n">objective</span><span class="o">=</span><span class="n">objective</span><span class="p">,</span> <span class="n">outcome_constraints</span><span class="o">=</span><span class="n">outcome_constraints</span>
-            <span class="p">),</span>
-            <span class="n">tracking_metrics</span><span class="p">,</span>
-        <span class="p">)</span></div>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">optimization_config</span><span class="p">,</span> <span class="n">tracking_metrics</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Decoder.arm_from_sqa"><a class="viewcode-back" href="../../../../storage.html#ax.storage.sqa_store.decoder.Decoder.arm_from_sqa">[docs]</a>    <span class="k">def</span> <span class="nf">arm_from_sqa</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arm_sqa</span><span class="p">:</span> <span class="n">SQAArm</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Arm</span><span class="p">:</span>
         <span class="sd">"""Convert SQLAlchemy Arm to Ax Arm."""</span>

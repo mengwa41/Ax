@@ -35,7 +35,7 @@ src="/js/documentation_options.js">
 <span class="c1"># pyre-strict</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">from</span> <span class="nn">ax.core.metric</span> <span class="kn">import</span> <span class="n">Metric</span>
 <span class="kn">from</span> <span class="nn">ax.core.types</span> <span class="kn">import</span> <span class="n">ComparisonOp</span>
@@ -46,7 +46,7 @@ src="/js/documentation_options.js">
 <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <span class="n">CONSTRAINT_WARNING_MESSAGE</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="s2">"Specified constraint appears invalid: </span><span class="si">{bound}</span><span class="s2"> bound on metric "</span>
+    <span class="s2">"Constraint on </span><span class="si">{name}</span><span class="s2"> appears invalid: </span><span class="si">{bound}</span><span class="s2"> bound on metric "</span>
     <span class="o">+</span> <span class="s2">"for which </span><span class="si">{is_better}</span><span class="s2"> values are better."</span>
 <span class="p">)</span>
 <span class="n">LOWER_BOUND_MISMATCH</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"bound"</span><span class="p">:</span> <span class="s2">"Lower"</span><span class="p">,</span> <span class="s2">"is_better"</span><span class="p">:</span> <span class="s2">"lower"</span><span class="p">}</span>
@@ -119,12 +119,66 @@ src="/js/documentation_options.js">
             <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">ComparisonOp</span><span class="o">.</span><span class="n">LEQ</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">metric</span><span class="o">.</span><span class="n">lower_is_better</span><span class="p">:</span>
                 <span class="n">fmt_data</span> <span class="o">=</span> <span class="n">UPPER_BOUND_MISMATCH</span>
         <span class="k">if</span> <span class="n">fmt_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fmt_data</span><span class="p">[</span><span class="s2">"name"</span><span class="p">]</span> <span class="o">=</span> <span class="n">metric</span><span class="o">.</span><span class="n">name</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">CONSTRAINT_WARNING_MESSAGE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">fmt_data</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">op</span> <span class="o">=</span> <span class="s2">"&gt;="</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="n">ComparisonOp</span><span class="o">.</span><span class="n">GEQ</span> <span class="k">else</span> <span class="s2">"&lt;="</span>
         <span class="n">relative</span> <span class="o">=</span> <span class="s2">"%"</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">relative</span> <span class="k">else</span> <span class="s2">""</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">"OutcomeConstraint(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bound</span><span class="si">}{</span><span class="n">relative</span><span class="si">}</span><span class="s2">)"</span></div>
+
+
+<div class="viewcode-block" id="ObjectiveThreshold"><a class="viewcode-back" href="../../../core.html#ax.ObjectiveThreshold">[docs]</a><span class="k">class</span> <span class="nc">ObjectiveThreshold</span><span class="p">(</span><span class="n">OutcomeConstraint</span><span class="p">):</span>
+    <span class="sd">"""Class for representing Objective Thresholds.</span>
+
+<span class="sd">    An objective threshold represents the threshold for an objective metric</span>
+<span class="sd">    to contribute to hypervolume calculations. A list containing the objective</span>
+<span class="sd">    threshold for each metric collectively form a reference point.</span>
+
+<span class="sd">    Objective thresholds may bound the metric from above or from below.</span>
+<span class="sd">    The bound can be expressed as an absolute measurement or relative</span>
+<span class="sd">    to the status quo (if applicable).</span>
+
+<span class="sd">    The direction of the bound is inferred from the Metric's lower_is_better attribute.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        metric: Metric to constrain.</span>
+<span class="sd">        bound: The bound in the constraint.</span>
+<span class="sd">        relative: Whether you want to bound on an absolute or relative</span>
+<span class="sd">            scale. If relative, bound is the acceptable percent change.</span>
+<span class="sd">        op: automatically inferred, but manually overwritable.</span>
+<span class="sd">            specifies whether metric should be greater or equal to, or less</span>
+<span class="sd">            than or equal to, some bound.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">metric</span><span class="p">:</span> <span class="n">Metric</span><span class="p">,</span>
+        <span class="n">bound</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">relative</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">op</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComparisonOp</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">metric</span><span class="o">.</span><span class="n">lower_is_better</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">op</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Metric </span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s2"> must have attribute `lower_is_better` set or "</span>
+                    <span class="sa">f</span><span class="s2">"op </span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s2"> must be manually specified."</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">op</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">op</span> <span class="o">=</span> <span class="n">ComparisonOp</span><span class="o">.</span><span class="n">LEQ</span> <span class="k">if</span> <span class="n">metric</span><span class="o">.</span><span class="n">lower_is_better</span> <span class="k">else</span> <span class="n">ComparisonOp</span><span class="o">.</span><span class="n">GEQ</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">op</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">bound</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="n">relative</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ObjectiveThreshold.clone"><a class="viewcode-back" href="../../../core.html#ax.ObjectiveThreshold.clone">[docs]</a>    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"ObjectiveThreshold"</span><span class="p">:</span>
+        <span class="sd">"""Create a copy of this ObjectiveThreshold."""</span>
+        <span class="k">return</span> <span class="n">ObjectiveThreshold</span><span class="p">(</span>
+            <span class="n">metric</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metric</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bound</span><span class="p">,</span> <span class="n">relative</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">relative</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span>
+        <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="s2">"&gt;="</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="n">ComparisonOp</span><span class="o">.</span><span class="n">GEQ</span> <span class="k">else</span> <span class="s2">"&lt;="</span>
+        <span class="n">relative</span> <span class="o">=</span> <span class="s2">"%"</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">relative</span> <span class="k">else</span> <span class="s2">""</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"ObjectiveThreshold(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">op</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bound</span><span class="si">}{</span><span class="n">relative</span><span class="si">}</span><span class="s2">)"</span></div>
 </pre></div>
 </div>
 </div>

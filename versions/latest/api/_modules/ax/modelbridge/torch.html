@@ -32,7 +32,7 @@ src="/js/documentation_options.js">
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
@@ -43,6 +43,7 @@ src="/js/documentation_options.js">
 <span class="kn">from</span> <span class="nn">ax.core.search_space</span> <span class="kn">import</span> <span class="n">SearchSpace</span>
 <span class="kn">from</span> <span class="nn">ax.core.types</span> <span class="kn">import</span> <span class="n">TCandidateMetadata</span><span class="p">,</span> <span class="n">TConfig</span><span class="p">,</span> <span class="n">TGenMetadata</span>
 <span class="kn">from</span> <span class="nn">ax.modelbridge.array</span> <span class="kn">import</span> <span class="n">FIT_MODEL_ERROR</span><span class="p">,</span> <span class="n">ArrayModelBridge</span>
+<span class="kn">from</span> <span class="nn">ax.modelbridge.modelbridge_utils</span> <span class="kn">import</span> <span class="n">validate_and_apply_final_transform</span>
 <span class="kn">from</span> <span class="nn">ax.modelbridge.transforms.base</span> <span class="kn">import</span> <span class="n">Transform</span>
 <span class="kn">from</span> <span class="nn">ax.models.torch_base</span> <span class="kn">import</span> <span class="n">TorchModel</span>
 <span class="kn">from</span> <span class="nn">ax.utils.common.typeutils</span> <span class="kn">import</span> <span class="n">not_none</span>
@@ -67,12 +68,6 @@ src="/js/documentation_options.js">
 <span class="sd">    """</span>
 
     <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TorchModel</span><span class="p">]</span>
-    <span class="c1"># pyre-fixme[15]: `outcomes` overrides attribute defined in `ArrayModelBridge`</span>
-    <span class="c1">#  inconsistently.</span>
-    <span class="n">outcomes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
-    <span class="c1"># pyre-fixme[15]: `parameters` overrides attribute defined in `ArrayModelBridge`</span>
-    <span class="c1">#  inconsistently.</span>
-    <span class="n">parameters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
     <span class="n">_default_model_gen_options</span><span class="p">:</span> <span class="n">TConfig</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -214,11 +209,12 @@ src="/js/documentation_options.js">
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">TGenMetadata</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">TCandidateMetadata</span><span class="p">]]:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">FIT_MODEL_ERROR</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">"_model_gen"</span><span class="p">))</span>
-        <span class="n">obj_w</span><span class="p">,</span> <span class="n">oc_c</span><span class="p">,</span> <span class="n">l_c</span><span class="p">,</span> <span class="n">pend_obs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_and_convert_to_tensors</span><span class="p">(</span>
+        <span class="n">obj_w</span><span class="p">,</span> <span class="n">oc_c</span><span class="p">,</span> <span class="n">l_c</span><span class="p">,</span> <span class="n">pend_obs</span> <span class="o">=</span> <span class="n">validate_and_apply_final_transform</span><span class="p">(</span>
             <span class="n">objective_weights</span><span class="o">=</span><span class="n">objective_weights</span><span class="p">,</span>
             <span class="n">outcome_constraints</span><span class="o">=</span><span class="n">outcome_constraints</span><span class="p">,</span>
             <span class="n">linear_constraints</span><span class="o">=</span><span class="n">linear_constraints</span><span class="p">,</span>
             <span class="n">pending_observations</span><span class="o">=</span><span class="n">pending_observations</span><span class="p">,</span>
+            <span class="n">final_transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_array_to_tensor</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">tensor_rounding_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_array_callable_to_tensor_callable</span><span class="p">(</span><span class="n">rounding_func</span><span class="p">)</span>
         <span class="n">augmented_model_gen_options</span> <span class="o">=</span> <span class="p">{</span>
@@ -257,11 +253,12 @@ src="/js/documentation_options.js">
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>  <span class="c1"># pragma: no cover</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">FIT_MODEL_ERROR</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">"_model_gen"</span><span class="p">))</span>
-        <span class="n">obj_w</span><span class="p">,</span> <span class="n">oc_c</span><span class="p">,</span> <span class="n">l_c</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_and_convert_to_tensors</span><span class="p">(</span>
+        <span class="n">obj_w</span><span class="p">,</span> <span class="n">oc_c</span><span class="p">,</span> <span class="n">l_c</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">validate_and_apply_final_transform</span><span class="p">(</span>
             <span class="n">objective_weights</span><span class="o">=</span><span class="n">objective_weights</span><span class="p">,</span>
             <span class="n">outcome_constraints</span><span class="o">=</span><span class="n">outcome_constraints</span><span class="p">,</span>
             <span class="n">linear_constraints</span><span class="o">=</span><span class="n">linear_constraints</span><span class="p">,</span>
             <span class="n">pending_observations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">final_transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_array_to_tensor</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># pyre-fixme[16]: `Optional` has no attribute `best_point`.</span>
@@ -301,41 +298,7 @@ src="/js/documentation_options.js">
             <span class="n">cov_test</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_validate_and_convert_to_tensors</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">objective_weights</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-        <span class="n">outcome_constraints</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]],</span>
-        <span class="n">linear_constraints</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]],</span>
-        <span class="n">pending_observations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]],</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
-        <span class="n">Tensor</span><span class="p">,</span>
-        <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]],</span>
-        <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]],</span>
-        <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]],</span>
-    <span class="p">]:</span>
-        <span class="n">objective_weights</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_array_to_tensor</span><span class="p">(</span><span class="n">objective_weights</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">outcome_constraints</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-            <span class="n">outcome_constraints</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_array_to_tensor</span><span class="p">(</span><span class="n">outcome_constraints</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_array_to_tensor</span><span class="p">(</span><span class="n">outcome_constraints</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="n">linear_constraints</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-            <span class="n">linear_constraints</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_array_to_tensor</span><span class="p">(</span><span class="n">linear_constraints</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_array_to_tensor</span><span class="p">(</span><span class="n">linear_constraints</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="n">pending_observations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-            <span class="n">pending_observations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_array_list_to_tensors</span><span class="p">(</span>
-                <span class="n">pending_observations</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="n">objective_weights</span><span class="p">,</span>
-            <span class="n">outcome_constraints</span><span class="p">,</span>
-            <span class="n">linear_constraints</span><span class="p">,</span>
-            <span class="n">pending_observations</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_array_to_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">_array_to_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_array_list_to_tensors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arrays</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]:</span>
@@ -354,7 +317,13 @@ src="/js/documentation_options.js">
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_array_to_tensor</span><span class="p">(</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_transform_observation_features</span><span class="p">(</span><span class="n">observation_features</span><span class="p">)</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_transform_observation_data</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">observation_data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationData</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+        <span class="n">mean</span><span class="p">,</span> <span class="n">cov</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_transform_observation_data</span><span class="p">(</span><span class="n">observation_data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_array_to_tensor</span><span class="p">(</span><span class="n">mean</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_array_to_tensor</span><span class="p">(</span><span class="n">cov</span><span class="p">)</span></div>
 </pre></div>
 </div>
 </div>

@@ -73,7 +73,7 @@ src="/js/documentation_options.js">
 <span class="kn">from</span> <span class="nn">ax.models.torch.botorch</span> <span class="kn">import</span> <span class="n">BotorchModel</span>
 <span class="kn">from</span> <span class="nn">ax.models.torch.botorch_kg</span> <span class="kn">import</span> <span class="n">KnowledgeGradient</span>
 <span class="kn">from</span> <span class="nn">ax.models.torch.botorch_mes</span> <span class="kn">import</span> <span class="n">MaxValueEntropySearch</span>
-<span class="kn">from</span> <span class="nn">ax.models.torch.botorch_modular.model</span> <span class="kn">import</span> <span class="n">BoTorchModel</span>
+<span class="kn">from</span> <span class="nn">ax.models.torch.botorch_modular.model</span> <span class="kn">import</span> <span class="n">BoTorchModel</span> <span class="k">as</span> <span class="n">ModularBoTorchModel</span>
 <span class="kn">from</span> <span class="nn">ax.models.torch.botorch_moo</span> <span class="kn">import</span> <span class="n">MultiObjectiveBotorchModel</span>
 <span class="kn">from</span> <span class="nn">ax.utils.common.kwargs</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">consolidate_kwargs</span><span class="p">,</span>
@@ -138,10 +138,7 @@ src="/js/documentation_options.js">
     <span class="n">Cont_X_trans</span> <span class="o">+</span> <span class="p">[</span><span class="n">Derelativize</span><span class="p">,</span> <span class="n">StratifiedStandardizeY</span><span class="p">,</span> <span class="n">TaskEncode</span><span class="p">]</span>
 <span class="p">)</span>
 
-<span class="n">STANDARD_TORCH_BRIDGE_KWARGS</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">"torch_dtype"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span>
-    <span class="s2">"torch_device"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">"cpu"</span><span class="p">),</span>
-<span class="p">}</span>
+<span class="n">STANDARD_TORCH_BRIDGE_KWARGS</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"torch_dtype"</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">}</span>
 
 
 <div class="viewcode-block" id="ModelSetup"><a class="viewcode-back" href="../../../modelbridge.html#ax.ModelSetup">[docs]</a><span class="k">class</span> <span class="nc">ModelSetup</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
@@ -171,7 +168,7 @@ src="/js/documentation_options.js">
     <span class="p">),</span>
     <span class="s2">"BoTorch"</span><span class="p">:</span> <span class="n">ModelSetup</span><span class="p">(</span>
         <span class="n">bridge_class</span><span class="o">=</span><span class="n">TorchModelBridge</span><span class="p">,</span>
-        <span class="n">model_class</span><span class="o">=</span><span class="n">BoTorchModel</span><span class="p">,</span>
+        <span class="n">model_class</span><span class="o">=</span><span class="n">ModularBoTorchModel</span><span class="p">,</span>
         <span class="n">transforms</span><span class="o">=</span><span class="n">Cont_X_trans</span> <span class="o">+</span> <span class="n">Y_trans</span><span class="p">,</span>
         <span class="n">standard_bridge_kwargs</span><span class="o">=</span><span class="n">STANDARD_TORCH_BRIDGE_KWARGS</span><span class="p">,</span>
     <span class="p">),</span>

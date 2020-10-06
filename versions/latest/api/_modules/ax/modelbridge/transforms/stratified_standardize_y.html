@@ -138,7 +138,7 @@ src="/js/documentation_options.js">
         <span class="n">modelbridge</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">"modelbridge_module.base.ModelBridge"</span><span class="p">],</span>
         <span class="n">fixed_features</span><span class="p">:</span> <span class="n">ObservationFeatures</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizationConfig</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">optimization_config</span><span class="o">.</span><span class="n">outcome_constraints</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">optimization_config</span><span class="o">.</span><span class="n">all_constraints</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">optimization_config</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fixed_features</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -146,7 +146,7 @@ src="/js/documentation_options.js">
                 <span class="s2">"during generation."</span>
             <span class="p">)</span>
         <span class="n">v</span> <span class="o">=</span> <span class="n">fixed_features</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">p_name</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">optimization_config</span><span class="o">.</span><span class="n">outcome_constraints</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">optimization_config</span><span class="o">.</span><span class="n">all_constraints</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">relative</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s2">"StratifiedStandardizeY transform does not support relative "</span>
