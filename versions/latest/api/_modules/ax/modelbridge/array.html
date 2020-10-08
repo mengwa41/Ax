@@ -472,9 +472,9 @@ src="/js/documentation_options.js">
         <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Invalid formatting of observation features."</span><span class="p">)</span>
 
-    <span class="c1"># pyre-ignore [56]: While applying decorator</span>
-    <span class="c1"># `ax.utils.common.docutils.copy_doc(...)`: Expected ModelBridge but got...</span>
     <span class="nd">@copy_doc</span><span class="p">(</span><span class="n">ModelBridge</span><span class="o">.</span><span class="n">_pareto_frontier</span><span class="p">)</span>
+    <span class="c1"># pyre-fixme[14]: `_pareto_frontier` overrides method defined in `ModelBridge`</span>
+    <span class="c1">#  inconsistently.</span>
     <span class="k">def</span> <span class="nf">_pareto_frontier</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">objective_thresholds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TRefPoint</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -567,8 +567,6 @@ src="/js/documentation_options.js">
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">frontier_observation_data</span>
 
-    <span class="c1"># pyre-ignore [56]: While applying decorator</span>
-    <span class="c1"># `ax.utils.common.docutils.copy_doc(...)`: Expected ModelBridge but got...</span>
 <div class="viewcode-block" id="ArrayModelBridge.predicted_pareto_frontier"><a class="viewcode-back" href="../../../modelbridge.html#ax.modelbridge.array.ArrayModelBridge.predicted_pareto_frontier">[docs]</a>    <span class="nd">@copy_doc</span><span class="p">(</span><span class="n">ModelBridge</span><span class="o">.</span><span class="n">predicted_pareto_frontier</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">predicted_pareto_frontier</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -591,11 +589,11 @@ src="/js/documentation_options.js">
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pareto_frontier</span><span class="p">(</span>
             <span class="n">objective_thresholds</span><span class="o">=</span><span class="n">objective_thresholds</span><span class="p">,</span>
             <span class="n">observation_features</span><span class="o">=</span><span class="n">observation_features</span><span class="p">,</span>
+            <span class="c1"># pyre-fixme[6]: Expected `Optional[MultiObjectiveOptimizationConfig]`</span>
+            <span class="c1">#  for 3rd param but got `Optional[OptimizationConfig]`.</span>
             <span class="n">optimization_config</span><span class="o">=</span><span class="n">optimization_config</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-    <span class="c1"># pyre-ignore [56]: While applying decorator</span>
-    <span class="c1"># `ax.utils.common.docutils.copy_doc(...)`: Expected ModelBridge but got...</span>
     <span class="nd">@copy_doc</span><span class="p">(</span><span class="n">ModelBridge</span><span class="o">.</span><span class="n">_hypervolume</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">_hypervolume</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -609,6 +607,8 @@ src="/js/documentation_options.js">
             <span class="n">objective_thresholds</span><span class="o">=</span><span class="n">objective_thresholds</span><span class="p">,</span>
             <span class="n">observation_features</span><span class="o">=</span><span class="n">observation_features</span><span class="p">,</span>
             <span class="n">observation_data</span><span class="o">=</span><span class="n">observation_data</span><span class="p">,</span>
+            <span class="c1"># pyre-fixme[6]: Expected `Optional[MultiObjectiveOptimizationConfig]`</span>
+            <span class="c1">#  for 4th param but got `Optional[OptimizationConfig]`.</span>
             <span class="n">optimization_config</span><span class="o">=</span><span class="n">optimization_config</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">observation_data</span><span class="p">:</span>
@@ -650,8 +650,6 @@ src="/js/documentation_options.js">
         <span class="n">hv</span> <span class="o">=</span> <span class="n">Hypervolume</span><span class="p">(</span><span class="n">ref_point</span><span class="o">=</span><span class="n">obj_t</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">hv</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">means</span><span class="p">)</span>
 
-    <span class="c1"># pyre-ignore [56]: While applying decorator</span>
-    <span class="c1"># `ax.utils.common.docutils.copy_doc(...)`: Expected ModelBridge but got...</span>
 <div class="viewcode-block" id="ArrayModelBridge.predicted_hypervolume"><a class="viewcode-back" href="../../../modelbridge.html#ax.modelbridge.array.ArrayModelBridge.predicted_hypervolume">[docs]</a>    <span class="nd">@copy_doc</span><span class="p">(</span><span class="n">ModelBridge</span><span class="o">.</span><span class="n">predicted_hypervolume</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">predicted_hypervolume</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>

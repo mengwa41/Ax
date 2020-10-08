@@ -502,10 +502,6 @@ src="/js/documentation_options.js">
 
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">UNEXPECTED_METRIC_COMBINATION</span><span class="p">)</span>
 
-    <span class="c1"># pyre-fixme[56]: While applying decorator</span>
-    <span class="c1">#  `ax.utils.common.docutils.copy_doc(...)`: Expected `BaseTrial` for 1st param but</span>
-    <span class="c1">#  got `(self: Experiment, trial_index: int, metrics:</span>
-    <span class="c1">#  Optional[List[ax.core.metric.Metric]] = ..., **(Any)) -&gt; Data`.</span>
     <span class="nd">@copy_doc</span><span class="p">(</span><span class="n">BaseTrial</span><span class="o">.</span><span class="n">fetch_data</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">_fetch_trial_data</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">trial_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Metric</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>

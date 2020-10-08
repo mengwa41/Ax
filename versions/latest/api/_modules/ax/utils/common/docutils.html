@@ -38,13 +38,15 @@ src="/js/documentation_options.js">
 <span class="sd">"""</span>
 
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TypeVar</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">TypeVar</span>
 
 
 <span class="n">_T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"_T"</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="copy_doc"><a class="viewcode-back" href="../../../../utils.html#ax.utils.common.docutils.copy_doc">[docs]</a><span class="k">def</span> <span class="nf">copy_doc</span><span class="p">(</span><span class="n">src</span><span class="p">:</span> <span class="n">_T</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_T</span><span class="p">:</span>
+<span class="c1"># pyre-fixme[2]: Parameter annotation cannot contain `Any`.</span>
+<span class="c1"># pyre-ignore[34]: T77127616</span>
+<div class="viewcode-block" id="copy_doc"><a class="viewcode-back" href="../../../../utils.html#ax.utils.common.docutils.copy_doc">[docs]</a><span class="k">def</span> <span class="nf">copy_doc</span><span class="p">(</span><span class="n">src</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">_T</span><span class="p">],</span> <span class="n">_T</span><span class="p">]:</span>
     <span class="sd">"""A decorator that copies the docstring of another object</span>
 
 <span class="sd">    Since ``sphinx`` actually loads the python modules to grab the docstrings</span>
@@ -77,7 +79,6 @@ src="/js/documentation_options.js">
         <span class="n">dst</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="vm">__doc__</span>
         <span class="k">return</span> <span class="n">dst</span>
 
-    <span class="c1"># pyre-fixme[7]: Expected `_T` but got `Callable[[_T], _T]`.</span>
     <span class="k">return</span> <span class="n">copy_doc</span></div>
 </pre></div>
 </div>

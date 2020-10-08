@@ -399,6 +399,7 @@ src="/js/documentation_options.js">
             <span class="k">for</span> <span class="n">arm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_abandoned_arms_metadata</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
         <span class="p">]</span>
 
+    <span class="c1"># pyre-ignore[6]: T77111662.</span>
     <span class="nd">@copy_doc</span><span class="p">(</span><span class="n">BaseTrial</span><span class="o">.</span><span class="n">generator_runs</span><span class="p">)</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">generator_runs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">GeneratorRun</span><span class="p">]:</span>

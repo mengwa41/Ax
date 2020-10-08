@@ -532,11 +532,6 @@ src="/js/documentation_options.js">
         <span class="sd">"""Retrieve the parameterization of the trial by the given index."""</span>
         <span class="k">return</span> <span class="n">not_none</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_trial</span><span class="p">(</span><span class="n">trial_index</span><span class="p">)</span><span class="o">.</span><span class="n">arm</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span></div>
 
-    <span class="c1"># pyre-fixme[56]: While applying decorator</span>
-    <span class="c1">#  `ax.utils.common.docutils.copy_doc(...)`: Expected `Experiment` for 1st param</span>
-    <span class="c1">#  but got `(self: AxClient) -&gt; Optional[Tuple[Dict[str, typing.Union[None, bool,</span>
-    <span class="c1">#  float, int, str]], Optional[Tuple[Dict[str, float], Optional[Dict[str,</span>
-    <span class="c1">#  typing.Dict[str, float]]]]]]]`.</span>
 <div class="viewcode-block" id="AxClient.get_best_parameters"><a class="viewcode-back" href="../../../service.html#ax.service.ax_client.AxClient.get_best_parameters">[docs]</a>    <span class="nd">@copy_doc</span><span class="p">(</span><span class="n">best_point_utils</span><span class="o">.</span><span class="n">get_best_parameters</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_best_parameters</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
