@@ -72,6 +72,10 @@ src="/js/documentation_options.js">
         <span class="bp">self</span><span class="o">.</span><span class="n">noise_sd</span> <span class="o">=</span> <span class="n">noise_sd</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">lower_is_better</span><span class="o">=</span><span class="n">lower_is_better</span><span class="p">)</span>
 
+<div class="viewcode-block" id="NoisyFunctionMetric.is_available_while_running"><a class="viewcode-back" href="../../../metrics.html#ax.metrics.noisy_function.NoisyFunctionMetric.is_available_while_running">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_available_while_running</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
 <div class="viewcode-block" id="NoisyFunctionMetric.clone"><a class="viewcode-back" href="../../../metrics.html#ax.metrics.noisy_function.NoisyFunctionMetric.clone">[docs]</a>    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"NoisyFunctionMetric"</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
             <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span>

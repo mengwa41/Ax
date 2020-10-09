@@ -34,11 +34,11 @@ src="/js/documentation_options.js">
 
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">ax.core.generator_run</span> <span class="kn">import</span> <span class="n">GeneratorRun</span>
-<span class="kn">from</span> <span class="nn">ax.core.observation</span> <span class="kn">import</span> <span class="n">ObservationFeatures</span>
+<span class="kn">from</span> <span class="nn">ax.core.observation</span> <span class="kn">import</span> <span class="n">Observation</span><span class="p">,</span> <span class="n">ObservationFeatures</span>
 <span class="kn">from</span> <span class="nn">ax.core.parameter</span> <span class="kn">import</span> <span class="n">ChoiceParameter</span><span class="p">,</span> <span class="n">FixedParameter</span><span class="p">,</span> <span class="n">RangeParameter</span>
 <span class="kn">from</span> <span class="nn">ax.core.types</span> <span class="kn">import</span> <span class="n">TParameterization</span>
 <span class="kn">from</span> <span class="nn">ax.modelbridge.base</span> <span class="kn">import</span> <span class="n">ModelBridge</span>
@@ -136,6 +136,7 @@ src="/js/documentation_options.js">
     <span class="n">model</span><span class="p">:</span> <span class="n">ModelBridge</span><span class="p">,</span>
     <span class="n">metric_names</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">fixed_features</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservationFeatures</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">data_selector</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Observation</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">PlotInSampleArm</span><span class="p">],</span> <span class="n">RawData</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">TParameterization</span><span class="p">]]:</span>
     <span class="sd">"""Get in-sample arms from a model with observed and predicted values</span>
 <span class="sd">    for specified metrics.</span>
@@ -152,6 +153,7 @@ src="/js/documentation_options.js">
 <span class="sd">            metrics in the model.</span>
 <span class="sd">        fixed_features: Features that should be fixed in the arms this function</span>
 <span class="sd">            will obtain predictions for.</span>
+<span class="sd">        data_selector: Function for selecting observations for plotting.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A tuple containing</span>
@@ -164,6 +166,8 @@ src="/js/documentation_options.js">
 <span class="sd">        - Map from arm name to parameters</span>
 <span class="sd">    """</span>
     <span class="n">observations</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_training_data</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">data_selector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">observations</span> <span class="o">=</span> <span class="p">[</span><span class="n">obs</span> <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="n">observations</span> <span class="k">if</span> <span class="n">data_selector</span><span class="p">(</span><span class="n">obs</span><span class="p">)]</span>
     <span class="c1"># Calculate raw data</span>
     <span class="n">raw_data</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">arm_name_to_parameters</span> <span class="o">=</span> <span class="p">{}</span>
@@ -210,10 +214,10 @@ src="/js/documentation_options.js">
                 <span class="n">obs_y</span><span class="p">[</span><span class="n">metric_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">obs_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">means</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
                 <span class="n">obs_se</span><span class="p">[</span><span class="n">metric_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">obs_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">covariance</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span>
         <span class="c1"># Make a prediction.</span>
+        <span class="n">features</span> <span class="o">=</span> <span class="n">obs</span><span class="o">.</span><span class="n">features</span>
+        <span class="k">if</span> <span class="n">fixed_features</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">features</span><span class="o">.</span><span class="n">update_features</span><span class="p">(</span><span class="n">fixed_features</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">training_in_design</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
-            <span class="n">features</span> <span class="o">=</span> <span class="n">obs</span><span class="o">.</span><span class="n">features</span>
-            <span class="k">if</span> <span class="n">fixed_features</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">features</span><span class="o">.</span><span class="n">update_features</span><span class="p">(</span><span class="n">fixed_features</span><span class="p">)</span>
             <span class="n">pred_y</span><span class="p">,</span> <span class="n">pred_se</span> <span class="o">=</span> <span class="n">_predict_at_point</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span> <span class="n">metric_names</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Use raw data for out-of-design points</span>
@@ -315,6 +319,7 @@ src="/js/documentation_options.js">
     <span class="n">generator_runs_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GeneratorRun</span><span class="p">],</span>
     <span class="n">metric_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fixed_features</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservationFeatures</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">data_selector</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Observation</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">PlotData</span><span class="p">,</span> <span class="n">RawData</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">TParameterization</span><span class="p">]]:</span>
     <span class="sd">"""Format data object with metrics for in-sample and out-of-sample</span>
 <span class="sd">    arms.</span>
@@ -333,6 +338,7 @@ src="/js/documentation_options.js">
 <span class="sd">        metric_names: Restrict predictions to this set. If None, all metrics</span>
 <span class="sd">            in the model will be returned.</span>
 <span class="sd">        fixed_features: Fixed features to use when making model predictions.</span>
+<span class="sd">        data_selector: Function for selecting observations for plotting.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A tuple containing</span>
@@ -346,7 +352,10 @@ src="/js/documentation_options.js">
 <span class="sd">    """</span>
     <span class="n">metrics_plot</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">metric_names</span> <span class="k">if</span> <span class="n">metric_names</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">metric_names</span>
     <span class="n">in_sample_plot</span><span class="p">,</span> <span class="n">raw_data</span><span class="p">,</span> <span class="n">cond_name_to_parameters</span> <span class="o">=</span> <span class="n">_get_in_sample_arms</span><span class="p">(</span>
-        <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">metric_names</span><span class="o">=</span><span class="n">metrics_plot</span><span class="p">,</span> <span class="n">fixed_features</span><span class="o">=</span><span class="n">fixed_features</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+        <span class="n">metric_names</span><span class="o">=</span><span class="n">metrics_plot</span><span class="p">,</span>
+        <span class="n">fixed_features</span><span class="o">=</span><span class="n">fixed_features</span><span class="p">,</span>
+        <span class="n">data_selector</span><span class="o">=</span><span class="n">data_selector</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">out_of_sample_plot</span> <span class="o">=</span> <span class="n">_get_out_of_sample_arms</span><span class="p">(</span>
         <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
@@ -865,6 +874,15 @@ src="/js/documentation_options.js">
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">traces</span></div>
+
+
+<div class="viewcode-block" id="build_filter_trial"><a class="viewcode-back" href="../../../plot.html#ax.plot.helper.build_filter_trial">[docs]</a><span class="k">def</span> <span class="nf">build_filter_trial</span><span class="p">(</span><span class="n">keep_trial_indices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Observation</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]:</span>
+    <span class="sd">"""Creates a callable that filters observations based on trial_index"""</span>
+
+    <span class="k">def</span> <span class="nf">trial_filter</span><span class="p">(</span><span class="n">obs</span><span class="p">:</span> <span class="n">Observation</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">obs</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">trial_index</span> <span class="ow">in</span> <span class="n">keep_trial_indices</span>
+
+    <span class="k">return</span> <span class="n">trial_filter</span></div>
 </pre></div>
 </div>
 </div>

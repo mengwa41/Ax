@@ -77,6 +77,20 @@ src="/js/documentation_options.js">
         <span class="bp">self</span><span class="o">.</span><span class="n">lower_is_better</span> <span class="o">=</span> <span class="n">lower_is_better</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">properties</span> <span class="o">=</span> <span class="n">properties</span> <span class="ow">or</span> <span class="p">{}</span>
 
+<div class="viewcode-block" id="Metric.is_available_while_running"><a class="viewcode-back" href="../../../core.html#ax.Metric.is_available_while_running">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">is_available_while_running</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">"""Whether metrics of this class are available while the trial is running.</span>
+<span class="sd">        Metrics that are not available while the trial is running are assumed to be</span>
+<span class="sd">        available only upon trial completion. For such metrics, data is assumed to</span>
+<span class="sd">        never change once the trial is completed.</span>
+
+<span class="sd">        NOTE: If this method returns `False`, data-fetching via `experiment.fetch_data`</span>
+<span class="sd">        will return the data cached on the experiment (for the metrics of the given</span>
+<span class="sd">        class) whenever its available. Data is cached on experiment when attached</span>
+<span class="sd">        via `experiment.attach_data`.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">"""Get name of metric."""</span>
@@ -95,7 +109,7 @@ src="/js/documentation_options.js">
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span>
 
 <div class="viewcode-block" id="Metric.serialize_init_args"><a class="viewcode-back" href="../../../core.html#ax.Metric.serialize_init_args">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">serialize_init_args</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="s2">"Metric"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">serialize_init_args</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="n">Metric</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="sd">"""Serialize the properties needed to initialize the metric.</span>
 <span class="sd">        Used for storage.</span>
 <span class="sd">        """</span>
@@ -142,9 +156,10 @@ src="/js/documentation_options.js">
 <span class="sd">        Default behavior calls `fetch_trial_data` for each metric.</span>
 <span class="sd">        Subclasses should override this to trial data computation for multiple metrics.</span>
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="n">Data</span><span class="o">.</span><span class="n">from_multiple_data</span><span class="p">(</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="n">Data</span><span class="o">.</span><span class="n">from_multiple_data</span><span class="p">(</span>
             <span class="p">[</span><span class="n">metric</span><span class="o">.</span><span class="n">fetch_trial_data</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">]</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">dat</span></div>
 
 <div class="viewcode-block" id="Metric.fetch_experiment_data_multi"><a class="viewcode-back" href="../../../core.html#ax.Metric.fetch_experiment_data_multi">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">fetch_experiment_data_multi</span><span class="p">(</span>
@@ -166,6 +181,83 @@ src="/js/documentation_options.js">
                 <span class="k">else</span> <span class="n">Data</span><span class="p">()</span>
                 <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="p">(</span><span class="n">experiment</span><span class="o">.</span><span class="n">trials</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">trials</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">trials</span><span class="p">)</span>
             <span class="p">]</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Metric.lookup_or_fetch_experiment_data_multi"><a class="viewcode-back" href="../../../core.html#ax.Metric.lookup_or_fetch_experiment_data_multi">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">lookup_or_fetch_experiment_data_multi</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">experiment</span><span class="p">:</span> <span class="n">core</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">Experiment</span><span class="p">,</span>
+        <span class="n">metrics</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Metric</span><span class="p">],</span>
+        <span class="n">trials</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">core</span><span class="o">.</span><span class="n">base_trial</span><span class="o">.</span><span class="n">BaseTrial</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Data</span><span class="p">:</span>
+        <span class="sd">"""Fetch or lookup (with fallback to fetching) data for given metrics,</span>
+<span class="sd">        depending on whether they are available while running.</span>
+
+<span class="sd">        If metric is available while running, its data can change (and therefore</span>
+<span class="sd">        we should always re-fetch it). If metric is available only upon trial</span>
+<span class="sd">        completion, its data does not change, so we can look up that data on</span>
+<span class="sd">        the experiment and only fetch the data that is not already attached to</span>
+<span class="sd">        the experiment.</span>
+
+<span class="sd">        NOTE: If fetching data for a metrics class that is only available upon</span>
+<span class="sd">        trial completion, data fetched in this function (data that was not yet</span>
+<span class="sd">        available on experiment) will be attached to experiment.</span>
+<span class="sd">        """</span>
+        <span class="c1"># If this metric is available while trial is running, just default to</span>
+        <span class="c1"># `fetch_experiment_data_multi`.</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">is_available_while_running</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">fetch_experiment_data_multi</span><span class="p">(</span>
+                <span class="n">experiment</span><span class="o">=</span><span class="n">experiment</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="n">trials</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+            <span class="p">)</span>
+
+        <span class="c1"># If this metric is available only upon trial completion, look up data</span>
+        <span class="c1"># on experiment and only fetch data that is not already cached.</span>
+        <span class="k">if</span> <span class="n">trials</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">completed_trials</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">trials_by_status</span><span class="p">[</span>
+                <span class="n">core</span><span class="o">.</span><span class="n">base_trial</span><span class="o">.</span><span class="n">TrialStatus</span><span class="o">.</span><span class="n">COMPLETED</span>
+            <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">completed_trials</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">trials</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">is_completed</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">completed_trials</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Data</span><span class="p">()</span>
+
+        <span class="n">trials_data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="n">completed_trials</span><span class="p">:</span>
+            <span class="n">cached_trial_data</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">lookup_data_for_trial</span><span class="p">(</span>
+                <span class="n">trial_index</span><span class="o">=</span><span class="n">trial</span><span class="o">.</span><span class="n">index</span>
+            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">cached_metric_names</span> <span class="o">=</span> <span class="n">cached_trial_data</span><span class="o">.</span><span class="n">metric_names</span>
+            <span class="n">metrics_to_fetch</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metrics</span> <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cached_metric_names</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">metrics_to_fetch</span><span class="p">:</span>
+                <span class="c1"># If all needed data fetched from cache, no need to fetch any other data</span>
+                <span class="c1"># for trial.</span>
+                <span class="n">trials_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cached_trial_data</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">fetched_trial_data</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">fetch_experiment_data_multi</span><span class="p">(</span>
+                    <span class="n">experiment</span><span class="o">=</span><span class="n">experiment</span><span class="p">,</span>
+                    <span class="n">metrics</span><span class="o">=</span><span class="n">metrics_to_fetch</span><span class="p">,</span>
+                    <span class="n">trials</span><span class="o">=</span><span class="p">[</span><span class="n">trial</span><span class="p">],</span>
+                    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+                <span class="c1"># Metric does not implement fetching logic and only uses lookup.</span>
+                <span class="n">fetched_trial_data</span> <span class="o">=</span> <span class="n">Data</span><span class="p">()</span>
+
+            <span class="n">final_data</span> <span class="o">=</span> <span class="n">Data</span><span class="o">.</span><span class="n">from_multiple_data</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">cached_trial_data</span><span class="p">,</span> <span class="n">fetched_trial_data</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">final_data</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                <span class="n">experiment</span><span class="o">.</span><span class="n">attach_data</span><span class="p">(</span><span class="n">final_data</span><span class="p">)</span>
+            <span class="n">trials_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">final_data</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Data</span><span class="o">.</span><span class="n">from_multiple_data</span><span class="p">(</span>
+            <span class="n">trials_data</span><span class="p">,</span> <span class="n">subset_metrics</span><span class="o">=</span><span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">]</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Metric.clone"><a class="viewcode-back" href="../../../core.html#ax.Metric.clone">[docs]</a>    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Metric"</span><span class="p">:</span>

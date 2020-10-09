@@ -34,11 +34,11 @@ src="/js/documentation_options.js">
 
 <span class="kn">import</span> <span class="nn">numbers</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">plotly.graph_objs</span> <span class="k">as</span> <span class="nn">go</span>
-<span class="kn">from</span> <span class="nn">ax.core.observation</span> <span class="kn">import</span> <span class="n">ObservationFeatures</span>
+<span class="kn">from</span> <span class="nn">ax.core.observation</span> <span class="kn">import</span> <span class="n">Observation</span><span class="p">,</span> <span class="n">ObservationFeatures</span>
 <span class="kn">from</span> <span class="nn">ax.modelbridge.base</span> <span class="kn">import</span> <span class="n">ModelBridge</span>
 <span class="kn">from</span> <span class="nn">ax.plot.base</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CI_OPACITY</span><span class="p">,</span>
@@ -281,6 +281,7 @@ src="/js/documentation_options.js">
     <span class="n">rel_x</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">rel_y</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="n">fixed_features</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservationFeatures</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">data_selector</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Observation</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Traces</span><span class="p">:</span>
     <span class="sd">"""Plot traces for multiple metrics given a model and metrics.</span>
 
@@ -293,6 +294,7 @@ src="/js/documentation_options.js">
 <span class="sd">        rel_x: if True, use relative effects on metric_x.</span>
 <span class="sd">        rel_y: if True, use relative effects on metric_y.</span>
 <span class="sd">        fixed_features: Fixed features to use when making model predictions.</span>
+<span class="sd">        data_selector: Function for selecting observations for plotting.</span>
 
 <span class="sd">    """</span>
     <span class="n">plot_data</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_plot_data</span><span class="p">(</span>
@@ -300,6 +302,7 @@ src="/js/documentation_options.js">
         <span class="n">generator_runs_dict</span> <span class="k">if</span> <span class="n">generator_runs_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{},</span>
         <span class="p">{</span><span class="n">metric_x</span><span class="p">,</span> <span class="n">metric_y</span><span class="p">},</span>
         <span class="n">fixed_features</span><span class="o">=</span><span class="n">fixed_features</span><span class="p">,</span>
+        <span class="n">data_selector</span><span class="o">=</span><span class="n">data_selector</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">status_quo_arm</span> <span class="o">=</span> <span class="p">(</span>
@@ -360,6 +363,8 @@ src="/js/documentation_options.js">
     <span class="n">metric_y</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">generator_runs_dict</span><span class="p">:</span> <span class="n">TNullableGeneratorRunsDict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">rel</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">fixed_features</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservationFeatures</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">data_selector</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Observation</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AxPlotConfig</span><span class="p">:</span>
     <span class="sd">"""Plot raw values or predictions of two metrics for arms.</span>
 
@@ -373,10 +378,18 @@ src="/js/documentation_options.js">
 <span class="sd">        generator_runs_dict: a mapping from</span>
 <span class="sd">            generator run name to generator run.</span>
 <span class="sd">        rel: if True, use relative effects. Default is True.</span>
+<span class="sd">        data_selector: Function for selecting observations for plotting.</span>
 
 <span class="sd">    """</span>
     <span class="n">traces</span> <span class="o">=</span> <span class="n">_multiple_metric_traces</span><span class="p">(</span>
-        <span class="n">model</span><span class="p">,</span> <span class="n">metric_x</span><span class="p">,</span> <span class="n">metric_y</span><span class="p">,</span> <span class="n">generator_runs_dict</span><span class="p">,</span> <span class="n">rel_x</span><span class="o">=</span><span class="n">rel</span><span class="p">,</span> <span class="n">rel_y</span><span class="o">=</span><span class="n">rel</span>
+        <span class="n">model</span><span class="p">,</span>
+        <span class="n">metric_x</span><span class="p">,</span>
+        <span class="n">metric_y</span><span class="p">,</span>
+        <span class="n">generator_runs_dict</span><span class="p">,</span>
+        <span class="n">rel_x</span><span class="o">=</span><span class="n">rel</span><span class="p">,</span>
+        <span class="n">rel_y</span><span class="o">=</span><span class="n">rel</span><span class="p">,</span>
+        <span class="n">fixed_features</span><span class="o">=</span><span class="n">fixed_features</span><span class="p">,</span>
+        <span class="n">data_selector</span><span class="o">=</span><span class="n">data_selector</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">num_cand_traces</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">generator_runs_dict</span><span class="p">)</span> <span class="k">if</span> <span class="n">generator_runs_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
 
@@ -486,6 +499,7 @@ src="/js/documentation_options.js">
     <span class="n">rel</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">infer_relative_constraints</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">fixed_features</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservationFeatures</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">data_selector</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Observation</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AxPlotConfig</span><span class="p">:</span>
     <span class="sd">"""Plot the tradeoff between an objetive and all other metrics in a model.</span>
 
@@ -509,6 +523,7 @@ src="/js/documentation_options.js">
 <span class="sd">            Objectives will respect the `rel` parameter.</span>
 <span class="sd">            Metrics that are not constraints will be relativized.</span>
 <span class="sd">        fixed_features: Fixed features to use when making model predictions.</span>
+<span class="sd">        data_selector: Function for selecting observations for plotting.</span>
 
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">subset_metrics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -541,6 +556,7 @@ src="/js/documentation_options.js">
         <span class="n">rel_x</span><span class="o">=</span><span class="n">rels</span><span class="p">[</span><span class="n">objective</span><span class="p">],</span>
         <span class="n">rel_y</span><span class="o">=</span><span class="n">rels</span><span class="p">[</span><span class="n">metrics</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
         <span class="n">fixed_features</span><span class="o">=</span><span class="n">fixed_features</span><span class="p">,</span>
+        <span class="n">data_selector</span><span class="o">=</span><span class="n">data_selector</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">:</span>
@@ -552,6 +568,7 @@ src="/js/documentation_options.js">
             <span class="n">rel_x</span><span class="o">=</span><span class="n">rels</span><span class="p">[</span><span class="n">objective</span><span class="p">],</span>
             <span class="n">rel_y</span><span class="o">=</span><span class="n">rels</span><span class="p">[</span><span class="n">metric</span><span class="p">],</span>
             <span class="n">fixed_features</span><span class="o">=</span><span class="n">fixed_features</span><span class="p">,</span>
+            <span class="n">data_selector</span><span class="o">=</span><span class="n">data_selector</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="c1"># Current version of Plotly does not allow updating the yaxis label</span>
@@ -692,6 +709,7 @@ src="/js/documentation_options.js">
     <span class="n">generator_runs_dict</span><span class="p">:</span> <span class="n">TNullableGeneratorRunsDict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">rel</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">show_arm_details_on_hover</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">data_selector</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Observation</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AxPlotConfig</span><span class="p">:</span>
     <span class="sd">"""Plot raw values or predictions of combinations of two metrics for arms.</span>
 
@@ -702,6 +720,7 @@ src="/js/documentation_options.js">
 <span class="sd">        rel: if True, use relative effects. Default is True.</span>
 <span class="sd">        show_arm_details_on_hover: if True, display</span>
 <span class="sd">            parameterizations of arms on hover. Default is False.</span>
+<span class="sd">        data_selector: Function for selecting observations for plotting.</span>
 
 <span class="sd">    """</span>
     <span class="n">metrics</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">metric_names</span>
@@ -714,7 +733,10 @@ src="/js/documentation_options.js">
     <span class="p">)</span>
 
     <span class="n">plot_data</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_plot_data</span><span class="p">(</span>
-        <span class="n">model</span><span class="p">,</span> <span class="n">generator_runs_dict</span> <span class="k">if</span> <span class="n">generator_runs_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{},</span> <span class="n">metrics</span>
+        <span class="n">model</span><span class="p">,</span>
+        <span class="n">generator_runs_dict</span> <span class="k">if</span> <span class="n">generator_runs_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{},</span>
+        <span class="n">metrics</span><span class="p">,</span>
+        <span class="n">data_selector</span><span class="o">=</span><span class="n">data_selector</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">status_quo_arm</span> <span class="o">=</span> <span class="p">(</span>
         <span class="kc">None</span>
@@ -975,6 +997,7 @@ src="/js/documentation_options.js">
     <span class="n">show_CI</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">arm_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"arm"</span><span class="p">,</span>
     <span class="n">fixed_features</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservationFeatures</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">data_selector</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Observation</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Traces</span><span class="p">:</span>
     <span class="sd">"""Plot scatterplots with errors for a single metric (y-axis).</span>
 
@@ -992,10 +1015,15 @@ src="/js/documentation_options.js">
 <span class="sd">        show_CI: if True, render confidence intervals.</span>
 <span class="sd">        arm_noun: noun to use instead of "arm" (e.g. group)</span>
 <span class="sd">        fixed_features: Fixed features to use when making model predictions.</span>
+<span class="sd">        data_selector: Function for selecting observations for plotting.</span>
 
 <span class="sd">    """</span>
     <span class="n">plot_data</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_plot_data</span><span class="p">(</span>
-        <span class="n">model</span><span class="p">,</span> <span class="n">generator_runs_dict</span> <span class="ow">or</span> <span class="p">{},</span> <span class="p">{</span><span class="n">metric</span><span class="p">},</span> <span class="n">fixed_features</span><span class="o">=</span><span class="n">fixed_features</span>
+        <span class="n">model</span><span class="p">,</span>
+        <span class="n">generator_runs_dict</span> <span class="ow">or</span> <span class="p">{},</span>
+        <span class="p">{</span><span class="n">metric</span><span class="p">},</span>
+        <span class="n">fixed_features</span><span class="o">=</span><span class="n">fixed_features</span><span class="p">,</span>
+        <span class="n">data_selector</span><span class="o">=</span><span class="n">data_selector</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">status_quo_arm</span> <span class="o">=</span> <span class="p">(</span>
@@ -1056,6 +1084,7 @@ src="/js/documentation_options.js">
     <span class="n">custom_arm_order</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">custom_arm_order_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"Custom"</span><span class="p">,</span>
     <span class="n">show_CI</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">data_selector</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Observation</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AxPlotConfig</span><span class="p">:</span>
     <span class="sd">"""Plot fitted metrics.</span>
 
@@ -1071,10 +1100,16 @@ src="/js/documentation_options.js">
 <span class="sd">        custom_arm_order_name: name for custom ordering to</span>
 <span class="sd">            show in the ordering dropdown. Default is 'Custom'.</span>
 <span class="sd">        show_CI: if True, render confidence intervals.</span>
+<span class="sd">        data_selector: Function for selecting observations for plotting.</span>
 
 <span class="sd">    """</span>
     <span class="n">traces</span> <span class="o">=</span> <span class="n">_single_metric_traces</span><span class="p">(</span>
-        <span class="n">model</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">generator_runs_dict</span><span class="p">,</span> <span class="n">rel</span><span class="p">,</span> <span class="n">show_CI</span><span class="o">=</span><span class="n">show_CI</span>
+        <span class="n">model</span><span class="p">,</span>
+        <span class="n">metric</span><span class="p">,</span>
+        <span class="n">generator_runs_dict</span><span class="p">,</span>
+        <span class="n">rel</span><span class="p">,</span>
+        <span class="n">show_CI</span><span class="o">=</span><span class="n">show_CI</span><span class="p">,</span>
+        <span class="n">data_selector</span><span class="o">=</span><span class="n">data_selector</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="c1"># order arm name sorting arm numbers within batch</span>
@@ -1179,6 +1214,7 @@ src="/js/documentation_options.js">
     <span class="n">arm_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"arm"</span><span class="p">,</span>
     <span class="n">metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fixed_features</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservationFeatures</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">data_selector</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Observation</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AxPlotConfig</span><span class="p">:</span>
     <span class="sd">"""Tile version of fitted outcome plots.</span>
 
@@ -1193,6 +1229,7 @@ src="/js/documentation_options.js">
 <span class="sd">        arm_noun: noun to use instead of "arm" (e.g. group)</span>
 <span class="sd">        metrics: List of metric names to restrict to when plotting.</span>
 <span class="sd">        fixed_features: Fixed features to use when making model predictions.</span>
+<span class="sd">        data_selector: Function for selecting observations for plotting.</span>
 
 <span class="sd">    """</span>
     <span class="n">metrics</span> <span class="o">=</span> <span class="n">metrics</span> <span class="ow">or</span> <span class="nb">list</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">metric_names</span><span class="p">)</span>
@@ -1226,6 +1263,7 @@ src="/js/documentation_options.js">
             <span class="n">show_CI</span><span class="o">=</span><span class="n">show_CI</span><span class="p">,</span>
             <span class="n">arm_noun</span><span class="o">=</span><span class="n">arm_noun</span><span class="p">,</span>
             <span class="n">fixed_features</span><span class="o">=</span><span class="n">fixed_features</span><span class="p">,</span>
+            <span class="n">data_selector</span><span class="o">=</span><span class="n">data_selector</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="c1"># order arm name sorting arm numbers within batch</span>
@@ -1341,6 +1379,7 @@ src="/js/documentation_options.js">
     <span class="n">arm_noun</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"arm"</span><span class="p">,</span>
     <span class="n">metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fixed_features</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservationFeatures</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">data_selector</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Observation</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AxPlotConfig</span><span class="p">:</span>
     <span class="sd">"""Interactive fitted outcome plots for each arm used in fitting the model.</span>
 
@@ -1357,6 +1396,7 @@ src="/js/documentation_options.js">
 <span class="sd">        arm_noun: noun to use instead of "arm" (e.g. group)</span>
 <span class="sd">        metrics: List of metric names to restrict to when plotting.</span>
 <span class="sd">        fixed_features: Fixed features to use when making model predictions.</span>
+<span class="sd">        data_selector: Function for selecting observations for plotting.</span>
 <span class="sd">    """</span>
     <span class="n">traces_per_metric</span> <span class="o">=</span> <span class="p">(</span>
         <span class="mi">1</span> <span class="k">if</span> <span class="n">generator_runs_dict</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">len</span><span class="p">(</span><span class="n">generator_runs_dict</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
@@ -1377,6 +1417,7 @@ src="/js/documentation_options.js">
             <span class="n">show_CI</span><span class="o">=</span><span class="n">show_CI</span><span class="p">,</span>
             <span class="n">arm_noun</span><span class="o">=</span><span class="n">arm_noun</span><span class="p">,</span>
             <span class="n">fixed_features</span><span class="o">=</span><span class="n">fixed_features</span><span class="p">,</span>
+            <span class="n">data_selector</span><span class="o">=</span><span class="n">data_selector</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>

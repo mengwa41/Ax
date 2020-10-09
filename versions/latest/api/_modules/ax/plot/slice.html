@@ -106,7 +106,10 @@ src="/js/documentation_options.js">
     <span class="n">grid</span> <span class="o">=</span> <span class="n">get_grid_for_parameter</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">density</span><span class="p">)</span>
 
     <span class="n">plot_data</span><span class="p">,</span> <span class="n">raw_data</span><span class="p">,</span> <span class="n">cond_name_to_parameters</span> <span class="o">=</span> <span class="n">get_plot_data</span><span class="p">(</span>
-        <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">generator_runs_dict</span><span class="o">=</span><span class="n">generator_runs_dict</span><span class="p">,</span> <span class="n">metric_names</span><span class="o">=</span><span class="p">{</span><span class="n">metric_name</span><span class="p">}</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+        <span class="n">generator_runs_dict</span><span class="o">=</span><span class="n">generator_runs_dict</span><span class="p">,</span>
+        <span class="n">metric_names</span><span class="o">=</span><span class="p">{</span><span class="n">metric_name</span><span class="p">},</span>
+        <span class="n">fixed_features</span><span class="o">=</span><span class="n">fixed_features</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">fixed_features</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>

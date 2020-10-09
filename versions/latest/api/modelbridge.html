@@ -1641,7 +1641,7 @@ If not provided, all observations will be available for the test set.</p>
 <li><p><strong>model</strong> (<a class="reference internal" href="#ax.modelbridge.base.ModelBridge" title="ax.modelbridge.base.ModelBridge"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelBridge</span></code></a>) – Fitted model (ModelBridge) to cross validate.</p></li>
 <li><p><strong>folds</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – Number of folds. Use -1 for leave-one-out, otherwise will be
 k-fold.</p></li>
-<li><p><strong>test_select</strong> – Function for selecting observations for the test set.</p></li>
+<li><p><strong>test_selector</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code></a>]) – Function for selecting observations for the test set.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>

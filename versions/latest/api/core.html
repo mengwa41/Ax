@@ -1093,10 +1093,35 @@ data, in milliseconds.</p></li>
 </dd></dl>
 <dl class="method">
 <dt id="ax.core.data.Data.from_multiple_data">
-<em class="property">static </em><code class="sig-name descname">from_multiple_data</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ax/core/data.html#Data.from_multiple_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ax.core.data.Data.from_multiple_data" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<em class="property">static </em><code class="sig-name descname">from_multiple_data</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">subset_metrics=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ax/core/data.html#Data.from_multiple_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ax.core.data.Data.from_multiple_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Combines multiple data objects into one (with the concatenated
+underlying dataframe).</p>
+<p>NOTE: if one or more data objects in the iterable is of a custom
+subclass of <cite>Data</cite>, object of that class will be returned. If
+the iterable contains multiple types of <cite>Data</cite>, an error will be
+raised.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference internal" href="#ax.core.data.Data" title="ax.core.data.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a>]) – Iterable of Ax <cite>Data</cite> objects to combine.</p></li>
+<li><p><strong>subset_metrics</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]) – If specified, combined <cite>Data</cite> will only contain
+metrics, names of which appear in this iterable,
+in the underlying dataframe.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#ax.core.data.Data" title="ax.core.data.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="ax.core.data.Data.metric_names">
+<em class="property">property </em><code class="sig-name descname">metric_names</code><a class="headerlink" href="#ax.core.data.Data.metric_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set of metric names that appear in the underlying dataframe of
+this <cite>Data</cite> object.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#ax.core.data.Data" title="ax.core.data.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Set" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1291,7 +1316,14 @@ with multiple trial types, use the MultiTypeExperiment class.</p>
 <dl class="method">
 <dt id="ax.core.experiment.Experiment.fetch_data">
 <code class="sig-name descname">fetch_data</code><span class="sig-paren">(</span><em class="sig-param">metrics=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ax/core/experiment.html#Experiment.fetch_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ax.core.experiment.Experiment.fetch_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fetches data for all metrics and trials on this experiment.</p>
+<dd><p>Fetches data for all trials on this experiment and for either the
+specified metrics or all metrics currently on the experiment, if <cite>metrics</cite>
+argument is not specified.</p>
+<p>NOTE: For metrics that are not available while trial is running, the data
+may be retrieved from cache on the experiment. Data is cached on the experiment
+via calls to <cite>experiment.attach_data</cite> and whetner a given metric class is
+available while trial is running is determined by the boolean returned from its
+<cite>is_available_while_running</cite> class method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1312,6 +1344,11 @@ defined on the experiment.</p></li>
 <dt id="ax.core.experiment.Experiment.fetch_trials_data">
 <code class="sig-name descname">fetch_trials_data</code><span class="sig-paren">(</span><em class="sig-param">trial_indices</em>, <em class="sig-param">metrics=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ax/core/experiment.html#Experiment.fetch_trials_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ax.core.experiment.Experiment.fetch_trials_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetches data for specific trials on the experiment.</p>
+<p>NOTE: For metrics that are not available while trial is running, the data
+may be retrieved from cache on the experiment. Data is cached on the experiment
+via calls to <cite>experiment.attach_data</cite> and whetner a given metric class is
+available while trial is running is determined by the boolean returned from its
+<cite>is_available_while_running</cite> class method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -2049,6 +2086,42 @@ Subclasses should override this to trial data computation for multiple metrics.<
 </dl>
 </dd></dl>
 <dl class="method">
+<dt id="ax.core.metric.Metric.is_available_while_running">
+<em class="property">classmethod </em><code class="sig-name descname">is_available_while_running</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ax/core/metric.html#Metric.is_available_while_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ax.core.metric.Metric.is_available_while_running" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether metrics of this class are available while the trial is running.
+Metrics that are not available while the trial is running are assumed to be
+available only upon trial completion. For such metrics, data is assumed to
+never change once the trial is completed.</p>
+<p>NOTE: If this method returns <cite>False</cite>, data-fetching via <cite>experiment.fetch_data</cite>
+will return the data cached on the experiment (for the metrics of the given
+class) whenever its available. Data is cached on experiment when attached
+via <cite>experiment.attach_data</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
+<dt id="ax.core.metric.Metric.lookup_or_fetch_experiment_data_multi">
+<em class="property">classmethod </em><code class="sig-name descname">lookup_or_fetch_experiment_data_multi</code><span class="sig-paren">(</span><em class="sig-param">experiment</em>, <em class="sig-param">metrics</em>, <em class="sig-param">trials=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ax/core/metric.html#Metric.lookup_or_fetch_experiment_data_multi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ax.core.metric.Metric.lookup_or_fetch_experiment_data_multi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch or lookup (with fallback to fetching) data for given metrics,
+depending on whether they are available while running.</p>
+<p>If metric is available while running, its data can change (and therefore
+we should always re-fetch it). If metric is available only upon trial
+completion, its data does not change, so we can look up that data on
+the experiment and only fetch the data that is not already attached to
+the experiment.</p>
+<p>NOTE: If fetching data for a metrics class that is only available upon
+trial completion, data fetched in this function (data that was not yet
+available on experiment) will be attached to experiment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#ax.core.data.Data" title="ax.core.data.Data"><code class="xref py py-class docutils literal notranslate"><span class="pre">Data</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="method">
 <dt id="ax.core.metric.Metric.name">
 <em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#ax.core.metric.Metric.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get name of metric.</p>
@@ -2150,7 +2223,14 @@ fed into multi-task models.</p>
 <dl class="method">
 <dt id="ax.core.multi_type_experiment.MultiTypeExperiment.fetch_data">
 <code class="sig-name descname">fetch_data</code><span class="sig-paren">(</span><em class="sig-param">metrics=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ax/core/multi_type_experiment.html#MultiTypeExperiment.fetch_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ax.core.multi_type_experiment.MultiTypeExperiment.fetch_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fetches data for all metrics and trials on this experiment.</p>
+<dd><p>Fetches data for all trials on this experiment and for either the
+specified metrics or all metrics currently on the experiment, if <cite>metrics</cite>
+argument is not specified.</p>
+<p>NOTE: For metrics that are not available while trial is running, the data
+may be retrieved from cache on the experiment. Data is cached on the experiment
+via calls to <cite>experiment.attach_data</cite> and whetner a given metric class is
+available while trial is running is determined by the boolean returned from its
+<cite>is_available_while_running</cite> class method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -3836,7 +3916,14 @@ experiment.</p>
 <dl class="method">
 <dt id="ax.core.simple_experiment.SimpleExperiment.fetch_data">
 <code class="sig-name descname">fetch_data</code><span class="sig-paren">(</span><em class="sig-param">metrics=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ax/core/simple_experiment.html#SimpleExperiment.fetch_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ax.core.simple_experiment.SimpleExperiment.fetch_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fetches data for all metrics and trials on this experiment.</p>
+<dd><p>Fetches data for all trials on this experiment and for either the
+specified metrics or all metrics currently on the experiment, if <cite>metrics</cite>
+argument is not specified.</p>
+<p>NOTE: For metrics that are not available while trial is running, the data
+may be retrieved from cache on the experiment. Data is cached on the experiment
+via calls to <cite>experiment.attach_data</cite> and whetner a given metric class is
+available while trial is running is determined by the boolean returned from its
+<cite>is_available_while_running</cite> class method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

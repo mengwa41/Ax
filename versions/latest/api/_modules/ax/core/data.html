@@ -146,11 +146,44 @@ src="/js/documentation_options.js">
         <span class="k">return</span> <span class="n">COLUMN_DATA_TYPES</span></div>
 
 <div class="viewcode-block" id="Data.from_multiple_data"><a class="viewcode-back" href="../../../core.html#ax.Data.from_multiple_data">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">from_multiple_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Data</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Data</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">from_multiple_data</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Data</span><span class="p">],</span> <span class="n">subset_metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Data</span><span class="p">:</span>
+        <span class="sd">"""Combines multiple data objects into one (with the concatenated</span>
+<span class="sd">        underlying dataframe).</span>
+
+<span class="sd">        NOTE: if one or more data objects in the iterable is of a custom</span>
+<span class="sd">        subclass of `Data`, object of that class will be returned. If</span>
+<span class="sd">        the iterable contains multiple types of `Data`, an error will be</span>
+<span class="sd">        raised.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data: Iterable of Ax `Data` objects to combine.</span>
+<span class="sd">            subset_metrics: If specified, combined `Data` will only contain</span>
+<span class="sd">                metrics, names of which appear in this iterable,</span>
+<span class="sd">                in the underlying dataframe.</span>
+<span class="sd">        """</span>
         <span class="n">dfs</span> <span class="o">=</span> <span class="p">[</span><span class="n">datum</span><span class="o">.</span><span class="n">df</span> <span class="k">for</span> <span class="n">datum</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dfs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">Data</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">Data</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span></div>
+
+        <span class="k">if</span> <span class="n">subset_metrics</span><span class="p">:</span>
+            <span class="n">dfs</span> <span class="o">=</span> <span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">"metric_name"</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">subset_metrics</span><span class="p">)]</span> <span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">dfs</span><span class="p">]</span>
+
+        <span class="c1"># obtain type of first elt in iterable (we know it's not empty)</span>
+        <span class="n">data_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># check if all types in iterable match the first type</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">((</span><span class="nb">type</span><span class="p">(</span><span class="n">datum</span><span class="p">)</span> <span class="ow">is</span> <span class="n">data_type</span><span class="p">)</span> <span class="k">for</span> <span class="n">datum</span> <span class="ow">in</span> <span class="n">data</span><span class="p">):</span>
+            <span class="c1"># if all types in iterable are subclasses of Data, return the subclass</span>
+            <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">data_type</span><span class="p">,</span> <span class="n">Data</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">data_type</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># if not, return the original Data object</span>
+                <span class="k">return</span> <span class="n">Data</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"More than one custom data type found in data iterable"</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Data.from_evaluations"><a class="viewcode-back" href="../../../core.html#ax.Data.from_evaluations">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_evaluations</span><span class="p">(</span>
@@ -260,7 +293,14 @@ src="/js/documentation_options.js">
 <span class="sd">            str: The hash of the DataFrame.</span>
 
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="n">md5</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>  <span class="c1"># pyre-ignore</span></div>
+        <span class="k">return</span> <span class="n">md5</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>  <span class="c1"># pyre-ignore</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">metric_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">"""Set of metric names that appear in the underlying dataframe of</span>
+<span class="sd">        this `Data` object.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">empty</span> <span class="k">else</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">"metric_name"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="set_single_trial"><a class="viewcode-back" href="../../../core.html#ax.set_single_trial">[docs]</a><span class="k">def</span> <span class="nf">set_single_trial</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Data</span><span class="p">:</span>

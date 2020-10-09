@@ -51,7 +51,7 @@ src="/js/documentation_options.js">
 <span class="kn">from</span> <span class="nn">ax.core.search_space</span> <span class="kn">import</span> <span class="n">SearchSpace</span>
 <span class="kn">from</span> <span class="nn">ax.core.trial</span> <span class="kn">import</span> <span class="n">Trial</span>
 <span class="kn">from</span> <span class="nn">ax.exceptions.core</span> <span class="kn">import</span> <span class="n">UnsupportedError</span>
-<span class="kn">from</span> <span class="nn">ax.utils.common.constants</span> <span class="kn">import</span> <span class="n">UNEXPECTED_METRIC_COMBINATION</span><span class="p">,</span> <span class="n">Keys</span>
+<span class="kn">from</span> <span class="nn">ax.utils.common.constants</span> <span class="kn">import</span> <span class="n">Keys</span>
 <span class="kn">from</span> <span class="nn">ax.utils.common.docutils</span> <span class="kn">import</span> <span class="n">copy_doc</span>
 <span class="kn">from</span> <span class="nn">ax.utils.common.equality</span> <span class="kn">import</span> <span class="n">Base</span>
 <span class="kn">from</span> <span class="nn">ax.utils.common.logger</span> <span class="kn">import</span> <span class="n">get_logger</span>
@@ -425,7 +425,15 @@ src="/js/documentation_options.js">
         <span class="k">return</span> <span class="n">metrics_by_class</span>
 
 <div class="viewcode-block" id="Experiment.fetch_data"><a class="viewcode-back" href="../../../core.html#ax.Experiment.fetch_data">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Metric</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Data</span><span class="p">:</span>
-        <span class="sd">"""Fetches data for all metrics and trials on this experiment.</span>
+        <span class="sd">"""Fetches data for all trials on this experiment and for either the</span>
+<span class="sd">        specified metrics or all metrics currently on the experiment, if `metrics`</span>
+<span class="sd">        argument is not specified.</span>
+
+<span class="sd">        NOTE: For metrics that are not available while trial is running, the data</span>
+<span class="sd">        may be retrieved from cache on the experiment. Data is cached on the experiment</span>
+<span class="sd">        via calls to `experiment.attach_data` and whetner a given metric class is</span>
+<span class="sd">        available while trial is running is determined by the boolean returned from its</span>
+<span class="sd">        `is_available_while_running` class method.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            metrics: If provided, fetch data for these metrics instead of the ones</span>
@@ -435,7 +443,7 @@ src="/js/documentation_options.js">
 <span class="sd">        Returns:</span>
 <span class="sd">            Data for the experiment.</span>
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_trials_data</span><span class="p">(</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lookup_or_fetch_trials_data</span><span class="p">(</span>
             <span class="n">trials</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trials</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span> <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span></div>
 
@@ -447,6 +455,12 @@ src="/js/documentation_options.js">
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Data</span><span class="p">:</span>
         <span class="sd">"""Fetches data for specific trials on the experiment.</span>
 
+<span class="sd">        NOTE: For metrics that are not available while trial is running, the data</span>
+<span class="sd">        may be retrieved from cache on the experiment. Data is cached on the experiment</span>
+<span class="sd">        via calls to `experiment.attach_data` and whetner a given metric class is</span>
+<span class="sd">        available while trial is running is determined by the boolean returned from its</span>
+<span class="sd">        `is_available_while_running` class method.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            trial_indices: Indices of trials, for which to fetch data.</span>
 <span class="sd">            metrics: If provided, fetch data for these metrics instead of the ones</span>
@@ -456,13 +470,13 @@ src="/js/documentation_options.js">
 <span class="sd">        Returns:</span>
 <span class="sd">            Data for the specific trials on the experiment.</span>
 <span class="sd">        """</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_trials_data</span><span class="p">(</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lookup_or_fetch_trials_data</span><span class="p">(</span>
             <span class="n">trials</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_trials_by_indices</span><span class="p">(</span><span class="n">trial_indices</span><span class="o">=</span><span class="n">trial_indices</span><span class="p">),</span>
             <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_fetch_trials_data</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">_lookup_or_fetch_trials_data</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">trials</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BaseTrial</span><span class="p">],</span>
         <span class="n">metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Metric</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -473,81 +487,29 @@ src="/js/documentation_options.js">
                 <span class="s2">"No metrics to fetch data for, as no metrics are defined for "</span>
                 <span class="s2">"this experiment, and none were passed in to `fetch_data`."</span>
             <span class="p">)</span>
-        <span class="n">metrics</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">metrics</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Metric</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">):</span>
-            <span class="c1"># All metrics are 'dummy' base `Metric` class metrics, which do not</span>
-            <span class="c1"># implement actual data-fetching logic, so should look up attached</span>
-            <span class="c1"># data instead of trying to fetch it via logic in metrics.</span>
-            <span class="k">return</span> <span class="n">Data</span><span class="o">.</span><span class="n">from_multiple_data</span><span class="p">(</span>
-                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_data_for_trial</span><span class="p">(</span><span class="n">trial_index</span><span class="o">=</span><span class="n">t</span><span class="o">.</span><span class="n">index</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">trials</span><span class="p">]</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">Metric</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Metric</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">):</span>
-            <span class="c1"># All metrics are subclasses of `Metric`, which should implement fetching.</span>
-            <span class="n">data_list</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">metric_cls</span><span class="o">.</span><span class="n">fetch_experiment_data_multi</span><span class="p">(</span>
-                    <span class="n">experiment</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">metric_list</span><span class="p">,</span> <span class="n">trials</span><span class="o">=</span><span class="n">trials</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">expecting_data</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">trials</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">Data</span><span class="p">()</span>
+        <span class="n">metrics_to_fetch</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">metrics</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="n">metrics_by_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metrics_by_class</span><span class="p">(</span><span class="n">metrics</span><span class="o">=</span><span class="n">metrics_to_fetch</span><span class="p">)</span>
+        <span class="n">data_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">metric_cls</span> <span class="ow">in</span> <span class="n">metrics_by_class</span><span class="p">:</span>
+            <span class="n">data_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">metric_cls</span><span class="o">.</span><span class="n">lookup_or_fetch_experiment_data_multi</span><span class="p">(</span>
+                    <span class="n">experiment</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+                    <span class="n">metrics</span><span class="o">=</span><span class="n">metrics_by_class</span><span class="p">[</span><span class="n">metric_cls</span><span class="p">],</span>
+                    <span class="n">trials</span><span class="o">=</span><span class="n">trials</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="k">for</span> <span class="n">metric_cls</span><span class="p">,</span> <span class="n">metric_list</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metrics_by_class</span><span class="p">(</span>
-                    <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span>
-                <span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-            <span class="p">]</span>
-            <span class="c1"># For trials in candidate phase, append any attached data</span>
-            <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="n">trials</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">trial</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">TrialStatus</span><span class="o">.</span><span class="n">CANDIDATE</span><span class="p">:</span>
-                    <span class="n">trial_data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup_data_for_trial</span><span class="p">(</span><span class="n">trial_index</span><span class="o">=</span><span class="n">trial</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">trial_data</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-                        <span class="n">data_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trial_data</span><span class="p">)</span>
-
-            <span class="k">return</span> <span class="n">Data</span><span class="o">.</span><span class="n">from_multiple_data</span><span class="p">(</span><span class="n">data_list</span><span class="p">)</span>
-
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">UNEXPECTED_METRIC_COMBINATION</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">Data</span><span class="o">.</span><span class="n">from_multiple_data</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data_list</span><span class="p">)</span>
 
     <span class="nd">@copy_doc</span><span class="p">(</span><span class="n">BaseTrial</span><span class="o">.</span><span class="n">fetch_data</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">_fetch_trial_data</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">trial_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Metric</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Data</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">metrics</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">"No metrics to fetch data for, as no metrics are defined for "</span>
-                <span class="s2">"this experiment, and none were passed in to `fetch_trial_data`."</span>
-            <span class="p">)</span>
         <span class="n">trial</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trials</span><span class="p">[</span><span class="n">trial_index</span><span class="p">]</span>
-        <span class="n">metrics</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">metrics</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-
-        <span class="k">if</span> <span class="n">trial</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">TrialStatus</span><span class="o">.</span><span class="n">CANDIDATE</span> <span class="ow">or</span> <span class="nb">all</span><span class="p">(</span>
-            <span class="nb">type</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Metric</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metrics</span>
-        <span class="p">):</span>
-            <span class="c1"># Either trial is a `CANDIDATE` (so cannot use fetching logic) or</span>
-            <span class="c1"># all metrics are 'dummy' base `Metric` class metrics, which do not</span>
-            <span class="c1"># implement actual data-fetching logic. Should look up attached</span>
-            <span class="c1"># data instead of trying to fetch it via logic in metrics.</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup_data_for_trial</span><span class="p">(</span><span class="n">trial_index</span><span class="o">=</span><span class="n">trial_index</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-
-        <span class="k">elif</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">Metric</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Metric</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">):</span>
-            <span class="c1"># All metrics are subclasses of `Metric`, which should implement fetching.</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">trial</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">expecting_data</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">Data</span><span class="p">()</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_trial_data_no_lookup</span><span class="p">(</span>
-                <span class="n">trial_index</span><span class="o">=</span><span class="n">trial_index</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
-            <span class="p">)</span>
-
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">UNEXPECTED_METRIC_COMBINATION</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">_fetch_trial_data_no_lookup</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">trial_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Metric</span><span class="p">]],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Data</span><span class="p">:</span>
-        <span class="sd">"""Fetches data explicitly from metric logic, does not look up attached</span>
-<span class="sd">        data on experiment.</span>
-<span class="sd">        """</span>
-        <span class="k">return</span> <span class="n">Data</span><span class="o">.</span><span class="n">from_multiple_data</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="n">metric_cls</span><span class="o">.</span><span class="n">fetch_trial_data_multi</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">trials</span><span class="p">[</span><span class="n">trial_index</span><span class="p">],</span> <span class="n">metric_list</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
-                <span class="p">)</span>
-                <span class="k">for</span> <span class="n">metric_cls</span><span class="p">,</span> <span class="n">metric_list</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metrics_by_class</span><span class="p">(</span>
-                    <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span>
-                <span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-            <span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lookup_or_fetch_trials_data</span><span class="p">(</span>
+            <span class="n">trials</span><span class="o">=</span><span class="p">[</span><span class="n">trial</span><span class="p">],</span> <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="Experiment.attach_data"><a class="viewcode-back" href="../../../core.html#ax.Experiment.attach_data">[docs]</a>    <span class="k">def</span> <span class="nf">attach_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Data</span><span class="p">,</span> <span class="n">combine_with_last_data</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -574,6 +536,18 @@ src="/js/documentation_options.js">
 <span class="sd">        """</span>
         <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Data to attach is empty."</span><span class="p">)</span>
+        <span class="n">metrics_not_on_exp</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">"metric_name"</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">metrics_not_on_exp</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Attached data has some metrics (</span><span class="si">{</span><span class="n">metrics_not_on_exp</span><span class="si">}</span><span class="s2">) that are "</span>
+                <span class="s2">"not among the metrics on this experiment. Note that attaching data "</span>
+                <span class="s2">"will not automatically add those metrics to the experiment. "</span>
+                <span class="s2">"For these metrics to be automatically fetched by `experiment."</span>
+                <span class="s2">"fetch_data`, add them via `experiment.add_tracking_metric` or update "</span>
+                <span class="s2">"the experiment's optimization config."</span>
+            <span class="p">)</span>
         <span class="n">cur_time_millis</span> <span class="o">=</span> <span class="n">current_timestamp_in_millis</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">trial_index</span><span class="p">,</span> <span class="n">trial_df</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s2">"trial_index"</span><span class="p">]):</span>
             <span class="n">current_trial_data</span> <span class="o">=</span> <span class="p">(</span>

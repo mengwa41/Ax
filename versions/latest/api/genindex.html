@@ -689,6 +689,8 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="utils.html#ax.utils.common.logger.build_file_handler">build_file_handler() (in module ax.utils.common.logger)</a>
 </li>
+<li><a href="plot.html#ax.plot.helper.build_filter_trial">build_filter_trial() (in module ax.plot.helper)</a>
+</li>
 <li><a href="utils.html#ax.utils.common.logger.build_stream_handler">build_stream_handler() (in module ax.utils.common.logger)</a>
 </li>
 </ul></td>
@@ -1465,7 +1467,10 @@ src="/js/documentation_options.js">
 <li><a href="service.html#ax.service.ax_client.AxClient.from_json_snapshot">from_json_snapshot() (ax.service.ax_client.AxClient static method)</a>
 </li>
 <li><a href="core.html#ax.core.data.Data.from_multiple_data">from_multiple_data() (ax.core.data.Data static method)</a>
+<ul>
+<li><a href="ax.html#ax.Data.from_multiple_data">(ax.Data static method)</a>
 </li>
+</ul></li>
 <li><a href="utils.html#ax.utils.measurement.synthetic_functions.FromBotorch">FromBotorch (class in ax.utils.measurement.synthetic_functions)</a>
 </li>
 <li><a href="benchmark.html#ax.benchmark.benchmark.full_benchmark_run">full_benchmark_run() (in module ax.benchmark.benchmark)</a>
@@ -2116,12 +2121,12 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="core.html#ax.core.parameter.ParameterType.INT">INT (ax.core.parameter.ParameterType attribute)</a>
 </li>
-</ul></td>
-<td style="width: 33%; vertical-align: top;"><ul>
 <li><a href="modelbridge.html#ax.modelbridge.transforms.one_hot.OneHotEncoder.int_encoder">int_encoder (ax.modelbridge.transforms.one_hot.OneHotEncoder attribute)</a>
 </li>
 <li><a href="storage.html#ax.storage.sqa_store.sqa_classes.SQAMetric.intent">intent (ax.storage.sqa_store.sqa_classes.SQAMetric attribute)</a>
 </li>
+</ul></td>
+<td style="width: 33%; vertical-align: top;"><ul>
 <li><a href="storage.html#ax.storage.sqa_store.sqa_enum.IntEnum">IntEnum (class in ax.storage.sqa_store.sqa_enum)</a>
 </li>
 <li><a href="plot.html#ax.plot.diagnostic.interact_batch_comparison">interact_batch_comparison() (in module ax.plot.diagnostic)</a>
@@ -2155,6 +2160,15 @@ src="/js/documentation_options.js">
 <li><a href="core.html#ax.core.base_trial.BaseTrial.is_abandoned">is_abandoned() (ax.core.base_trial.BaseTrial property)</a>
 <ul>
 <li><a href="core.html#ax.core.base_trial.TrialStatus.is_abandoned">(ax.core.base_trial.TrialStatus property)</a>
+</li>
+</ul></li>
+<li><a href="core.html#ax.core.metric.Metric.is_available_while_running">is_available_while_running() (ax.core.metric.Metric class method)</a>
+<ul>
+<li><a href="ax.html#ax.Metric.is_available_while_running">(ax.Metric class method)</a>
+</li>
+<li><a href="metrics.html#ax.metrics.factorial.FactorialMetric.is_available_while_running">(ax.metrics.factorial.FactorialMetric class method)</a>
+</li>
+<li><a href="metrics.html#ax.metrics.noisy_function.NoisyFunctionMetric.is_available_while_running">(ax.metrics.noisy_function.NoisyFunctionMetric class method)</a>
 </li>
 </ul></li>
 <li><a href="storage.html#ax.storage.sqa_store.sqa_classes.SQATrial.is_batch">is_batch (ax.storage.sqa_store.sqa_classes.SQATrial attribute)</a>
@@ -2288,10 +2302,10 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="storage.html#ax.storage.sqa_store.load.load_generation_strategy_by_experiment_name">load_generation_strategy_by_experiment_name() (in module ax.storage.sqa_store.load)</a>
 </li>
-</ul></td>
-<td style="width: 33%; vertical-align: top;"><ul>
 <li><a href="storage.html#ax.storage.sqa_store.load.load_generation_strategy_by_id">load_generation_strategy_by_id() (in module ax.storage.sqa_store.load)</a>
 </li>
+</ul></td>
+<td style="width: 33%; vertical-align: top;"><ul>
 <li><a href="utils.html#ax.utils.tutorials.cnn_utils.load_mnist">load_mnist() (in module ax.utils.tutorials.cnn_utils)</a>
 </li>
 <li><a href="modelbridge.html#ax.modelbridge.transforms.log.Log">Log (class in ax.modelbridge.transforms.log)</a>
@@ -2318,6 +2332,11 @@ src="/js/documentation_options.js">
 <li><a href="core.html#ax.core.experiment.Experiment.lookup_data_for_ts">lookup_data_for_ts() (ax.core.experiment.Experiment method)</a>
 <ul>
 <li><a href="ax.html#ax.Experiment.lookup_data_for_ts">(ax.Experiment method)</a>
+</li>
+</ul></li>
+<li><a href="core.html#ax.core.metric.Metric.lookup_or_fetch_experiment_data_multi">lookup_or_fetch_experiment_data_multi() (ax.core.metric.Metric class method)</a>
+<ul>
+<li><a href="ax.html#ax.Metric.lookup_or_fetch_experiment_data_multi">(ax.Metric class method)</a>
 </li>
 </ul></li>
 <li><a href="storage.html#ax.storage.sqa_store.sqa_classes.SQAParameter.lower">lower (ax.storage.sqa_store.sqa_classes.SQAParameter attribute)</a>
@@ -2425,8 +2444,13 @@ src="/js/documentation_options.js">
 </li>
 <li><a href="core.html#ax.core.observation.ObservationData.metric_names">metric_names (ax.core.observation.ObservationData attribute)</a>
 </li>
-<li><a href="modelbridge.html#ax.modelbridge.base.ModelBridge.metric_names">metric_names() (ax.modelbridge.base.ModelBridge property)</a>
+<li><a href="core.html#ax.core.data.Data.metric_names">metric_names() (ax.core.data.Data property)</a>
+<ul>
+<li><a href="ax.html#ax.Data.metric_names">(ax.Data property)</a>
 </li>
+<li><a href="modelbridge.html#ax.modelbridge.base.ModelBridge.metric_names">(ax.modelbridge.base.ModelBridge property)</a>
+</li>
+</ul></li>
 <li><a href="storage.html#ax.storage.json_store.encoders.metric_to_dict">metric_to_dict() (in module ax.storage.json_store.encoders)</a>
 </li>
 <li><a href="storage.html#ax.storage.sqa_store.encoder.Encoder.metric_to_sqa">metric_to_sqa() (ax.storage.sqa_store.encoder.Encoder method)</a>
