@@ -2252,7 +2252,7 @@ src="/js/documentation_options.js">
 
 <span class="sd">              :attr:`.types.JSON.NULL`</span>
 
-<span class="sd">         """</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">none_as_null</span> <span class="o">=</span> <span class="n">none_as_null</span>
 
     <span class="k">class</span> <span class="nc">JSONElementType</span><span class="p">(</span><span class="n">TypeEngine</span><span class="p">):</span>
@@ -2664,9 +2664,13 @@ src="/js/documentation_options.js">
 
 <span class="sd">            """</span>
             <span class="n">operator</span> <span class="o">=</span> <span class="n">operator</span> <span class="k">if</span> <span class="n">operator</span> <span class="k">else</span> <span class="n">operators</span><span class="o">.</span><span class="n">eq</span>
-            <span class="k">return</span> <span class="n">operator</span><span class="p">(</span>
+
+            <span class="c1"># send plain BinaryExpression so that negate remains at None,</span>
+            <span class="c1"># leading to NOT expr for negation.</span>
+            <span class="k">return</span> <span class="n">elements</span><span class="o">.</span><span class="n">BinaryExpression</span><span class="p">(</span>
                 <span class="n">elements</span><span class="o">.</span><span class="n">_literal_as_binds</span><span class="p">(</span><span class="n">other</span><span class="p">),</span>
                 <span class="n">elements</span><span class="o">.</span><span class="n">CollectionAggregate</span><span class="o">.</span><span class="n">_create_any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expr</span><span class="p">),</span>
+                <span class="n">operator</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="nd">@util</span><span class="o">.</span><span class="n">dependencies</span><span class="p">(</span><span class="s2">"sqlalchemy.sql.elements"</span><span class="p">)</span>
@@ -2699,9 +2703,13 @@ src="/js/documentation_options.js">
 
 <span class="sd">            """</span>
             <span class="n">operator</span> <span class="o">=</span> <span class="n">operator</span> <span class="k">if</span> <span class="n">operator</span> <span class="k">else</span> <span class="n">operators</span><span class="o">.</span><span class="n">eq</span>
-            <span class="k">return</span> <span class="n">operator</span><span class="p">(</span>
+
+            <span class="c1"># send plain BinaryExpression so that negate remains at None,</span>
+            <span class="c1"># leading to NOT expr for negation.</span>
+            <span class="k">return</span> <span class="n">elements</span><span class="o">.</span><span class="n">BinaryExpression</span><span class="p">(</span>
                 <span class="n">elements</span><span class="o">.</span><span class="n">_literal_as_binds</span><span class="p">(</span><span class="n">other</span><span class="p">),</span>
                 <span class="n">elements</span><span class="o">.</span><span class="n">CollectionAggregate</span><span class="o">.</span><span class="n">_create_all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expr</span><span class="p">),</span>
+                <span class="n">operator</span><span class="p">,</span>
             <span class="p">)</span>
 
     <span class="n">comparator_factory</span> <span class="o">=</span> <span class="n">Comparator</span>

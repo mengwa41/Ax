@@ -44,7 +44,7 @@ src="/js/documentation_options.js">
 <span class="kn">from</span> <span class="nn">ax.core.data</span> <span class="kn">import</span> <span class="n">Data</span>
 <span class="kn">from</span> <span class="nn">ax.core.experiment</span> <span class="kn">import</span> <span class="n">Experiment</span>
 <span class="kn">from</span> <span class="nn">ax.core.generator_run</span> <span class="kn">import</span> <span class="n">GeneratorRun</span>
-<span class="kn">from</span> <span class="nn">ax.exceptions.core</span> <span class="kn">import</span> <span class="n">DataRequiredError</span>
+<span class="kn">from</span> <span class="nn">ax.exceptions.core</span> <span class="kn">import</span> <span class="n">DataRequiredError</span><span class="p">,</span> <span class="n">NoDataError</span>
 <span class="kn">from</span> <span class="nn">ax.exceptions.generation_strategy</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">GenerationStrategyCompleted</span><span class="p">,</span>
     <span class="n">MaxParallelismReachedException</span><span class="p">,</span>
@@ -510,7 +510,6 @@ src="/js/documentation_options.js">
                 <span class="n">model_class</span><span class="o">=</span><span class="n">not_none</span><span class="p">(</span><span class="n">not_none</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="p">),</span>
             <span class="p">)</span>
 
-        <span class="c1"># TODO[T65857344]: move from fetching all data to using cached data</span>
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_curr</span><span class="o">.</span><span class="n">use_update</span><span class="p">:</span>
                 <span class="c1"># If the new step is using `update`, it's important to instantiate</span>
@@ -526,6 +525,24 @@ src="/js/documentation_options.js">
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment</span><span class="o">.</span><span class="n">fetch_data</span><span class="p">()</span>
+        <span class="c1"># By the time we get here, we will have already transitioned</span>
+        <span class="c1"># to a new step, but if previou step required observed data,</span>
+        <span class="c1"># we should raise an error even if enough trials were completed.</span>
+        <span class="c1"># Such an empty data case does indicate an invalid state; this</span>
+        <span class="c1"># check is to improve the experience of detecting and debugging</span>
+        <span class="c1"># the invalid state that led to this.</span>
+        <span class="n">previous_step_required_observations</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_curr</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_steps</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_curr</span><span class="o">.</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">min_trials_observed</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">df</span><span class="o">.</span><span class="n">empty</span> <span class="ow">and</span> <span class="n">previous_step_required_observations</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NoDataError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Observed data is required for generation step #</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_curr</span><span class="o">.</span><span class="n">index</span><span class="si">}</span><span class="s2"> "</span>
+                <span class="sa">f</span><span class="s2">"(model </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_curr</span><span class="o">.</span><span class="n">model_name</span><span class="si">}</span><span class="s2">), but fetched data was empty. "</span>
+                <span class="s2">"Something is wrong with experiment setup -- likely metrics do not "</span>
+                <span class="s2">"implement fetching logic (check your metrics) or no data was "</span>
+                <span class="s2">"attached to experiment for completed trials."</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_curr</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">Models</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_current_model_from_models_enum</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">model_kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>

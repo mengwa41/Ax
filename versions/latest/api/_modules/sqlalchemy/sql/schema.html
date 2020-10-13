@@ -903,9 +903,7 @@ src="/js/documentation_options.js">
         <span class="s2">":class:`.DDLEvents`."</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">def</span> <span class="nf">append_ddl_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_name</span><span class="p">,</span> <span class="n">listener</span><span class="p">):</span>
-        <span class="sd">"""Append a DDL event listener to this ``Table``.</span>
-
-<span class="sd">        """</span>
+        <span class="sd">"""Append a DDL event listener to this ``Table``."""</span>
 
         <span class="k">def</span> <span class="nf">adapt_listener</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
             <span class="n">listener</span><span class="p">(</span><span class="n">event_name</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">connection</span><span class="p">)</span>
@@ -2843,8 +2841,7 @@ src="/js/documentation_options.js">
     <span class="s2">"future release.  Please refer to :class:`.DefaultClause`."</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="k">class</span> <span class="nc">PassiveDefault</span><span class="p">(</span><span class="n">DefaultClause</span><span class="p">):</span>
-    <span class="sd">"""A DDL-specified DEFAULT column value.</span>
-<span class="sd">    """</span>
+    <span class="sd">"""A DDL-specified DEFAULT column value."""</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">arg</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
         <span class="n">DefaultClause</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">arg</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
@@ -3726,10 +3723,14 @@ src="/js/documentation_options.js">
             <span class="k">if</span> <span class="n">col</span><span class="o">.</span><span class="n">autoincrement</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="n">_validate_autoinc</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">col</span>
-            <span class="k">elif</span> <span class="n">col</span><span class="o">.</span><span class="n">autoincrement</span> <span class="ow">in</span> <span class="p">(</span>
-                <span class="s2">"auto"</span><span class="p">,</span>
-                <span class="s2">"ignore_fk"</span><span class="p">,</span>
-            <span class="p">)</span> <span class="ow">and</span> <span class="n">_validate_autoinc</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">elif</span> <span class="p">(</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">autoincrement</span>
+                <span class="ow">in</span> <span class="p">(</span>
+                    <span class="s2">"auto"</span><span class="p">,</span>
+                    <span class="s2">"ignore_fk"</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="ow">and</span> <span class="n">_validate_autoinc</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="p">):</span>
                 <span class="k">return</span> <span class="n">col</span>
 
         <span class="k">else</span><span class="p">:</span>
@@ -4547,10 +4548,7 @@ src="/js/documentation_options.js">
         <span class="s2">":class:`.DDLEvents`."</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">def</span> <span class="nf">append_ddl_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_name</span><span class="p">,</span> <span class="n">listener</span><span class="p">):</span>
-        <span class="sd">"""Append a DDL event listener to this ``MetaData``.</span>
-
-
-<span class="sd">        """</span>
+        <span class="sd">"""Append a DDL event listener to this ``MetaData``."""</span>
 
         <span class="k">def</span> <span class="nf">adapt_listener</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
             <span class="n">tables</span> <span class="o">=</span> <span class="n">kw</span><span class="p">[</span><span class="s2">"tables"</span><span class="p">]</span>
