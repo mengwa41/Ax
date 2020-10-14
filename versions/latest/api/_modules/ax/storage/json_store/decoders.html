@@ -169,7 +169,8 @@ src="/js/documentation_options.js">
             <span class="n">reverse_registry</span> <span class="o">=</span> <span class="n">CLASS_TO_REVERSE_REGISTRY</span><span class="p">[</span><span class="n">_class</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">index_in_registry</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">reverse_registry</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">class_path</span><span class="si">}</span><span class="s2">' is not registered in the reverse registry."</span>
+                    <span class="sa">f</span><span class="s2">"Index '</span><span class="si">{</span><span class="n">index_in_registry</span><span class="si">}</span><span class="s2">'"</span>
+                    <span class="s2">" is not registered in the reverse registry."</span>
                 <span class="p">)</span>
             <span class="k">return</span> <span class="n">reverse_registry</span><span class="p">[</span><span class="n">index_in_registry</span><span class="p">]</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
